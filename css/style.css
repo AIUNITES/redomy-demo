@@ -314,3 +314,77 @@ h1 { font-size: 3rem; } h2 { font-size: 2rem; } h3 { font-size: 1.25rem; } h4 { 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 900px) { .landing-hero { grid-template-columns: 1fr; text-align: center; padding: 2rem 5%; } .hero-content h1 { font-size: 2.5rem; } .hero-visual { order: -1; } .hero-cards { transform: scale(0.8); } .btn-row { justify-content: center; } .nav-center { display: none; } .form-row { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .app-nav { padding: 1rem; } .user-name { display: none; } .dashboard-main { padding: 1rem; } .view-header { flex-direction: column; gap: 1rem; } .stats-row { grid-template-columns: repeat(2, 1fr); } .items-grid, .discover-grid { grid-template-columns: 1fr; } .toast-container { left: 1rem; right: 1rem; bottom: 1rem; } }
+
+/* ==================== ITEM DETAIL TABS ==================== */
+.detail-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-dark); padding-bottom: 1rem; }
+.detail-tab { padding: 0.5rem 1rem; background: transparent; color: var(--gray-light); border-radius: var(--radius-sm); font-weight: 500; transition: var(--transition); }
+.detail-tab:hover { color: var(--white); }
+.detail-tab.active { background: var(--gray-dark); color: var(--white); }
+.detail-tab-content { display: none; }
+.detail-tab-content.active { display: block; }
+
+/* ==================== TASK LIST ==================== */
+.task-section { margin-top: 1.5rem; }
+.task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.task-header h4 { font-size: 1rem; color: var(--gray-light); }
+.task-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.task-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-dark); border-radius: var(--radius-md); transition: var(--transition); }
+.task-item:hover { background: var(--gray); }
+.task-item.completed { opacity: 0.6; }
+.task-item.completed .task-name { text-decoration: line-through; color: var(--gray); }
+.task-checkbox { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+.task-info { flex: 1; }
+.task-name { font-weight: 500; }
+.task-due { font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem; }
+.task-due.overdue { color: #ef4444; }
+.task-due.soon { color: #f59e0b; }
+.task-delete { background: transparent; color: var(--gray); font-size: 1rem; padding: 0.25rem; transition: var(--transition); }
+.task-delete:hover { color: #ef4444; }
+.add-task-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.add-task-form input[type="text"] { flex: 1; padding: 0.5rem 0.75rem; background: var(--dark); border: 1px solid var(--gray-dark); border-radius: var(--radius-sm); color: var(--white); }
+.add-task-form input[type="date"] { padding: 0.5rem 0.75rem; background: var(--dark); border: 1px solid var(--gray-dark); border-radius: var(--radius-sm); color: var(--white); }
+.add-task-btn { padding: 0.5rem 1rem; background: var(--primary); color: var(--white); border-radius: var(--radius-sm); font-weight: 500; }
+.empty-tasks { text-align: center; padding: 2rem; color: var(--gray); }
+.empty-tasks-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
+.task-progress { margin-top: 1rem; }
+.task-progress-bar { height: 8px; background: var(--gray-dark); border-radius: 4px; overflow: hidden; }
+.task-progress-fill { height: 100%; background: var(--primary); transition: width 0.3s ease; }
+.task-progress-text { font-size: 0.8rem; color: var(--gray); margin-top: 0.5rem; text-align: right; }
+
+/* ==================== 3D PREVIEW PREMIUM ==================== */
+.premium-feature { position: relative; border-radius: var(--radius-lg); overflow: hidden; }
+.premium-preview { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); padding: 2rem; min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.premium-3d-mockup { position: relative; width: 100%; max-width: 400px; height: 200px; perspective: 1000px; margin-bottom: 1.5rem; }
+.room-3d { position: absolute; inset: 0; background: linear-gradient(145deg, #2a2a4a 0%, #1a1a3a 100%); border-radius: var(--radius-md); transform: rotateX(10deg) rotateY(-10deg); transform-style: preserve-3d; box-shadow: 20px 20px 60px rgba(0,0,0,0.5), -5px -5px 20px rgba(100,100,150,0.1); }
+.room-floor { position: absolute; bottom: 0; left: 10%; right: 10%; height: 40%; background: linear-gradient(180deg, #3a3a5a 0%, #2a2a4a 100%); transform: rotateX(60deg) translateZ(-20px); transform-origin: bottom; }
+.room-wall-back { position: absolute; top: 10%; left: 10%; right: 10%; height: 50%; background: linear-gradient(180deg, #4a4a6a 0%, #3a3a5a 100%); }
+.room-furniture { position: absolute; bottom: 25%; left: 20%; width: 30%; height: 20%; background: var(--primary); border-radius: 4px; opacity: 0.8; }
+.room-furniture-2 { position: absolute; bottom: 25%; right: 20%; width: 20%; height: 25%; background: var(--secondary); border-radius: 4px; opacity: 0.8; }
+.room-window { position: absolute; top: 20%; right: 25%; width: 20%; height: 30%; background: linear-gradient(180deg, #87CEEB 0%, #5CACEE 100%); border: 3px solid #4a4a6a; border-radius: 2px; }
+.premium-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+.premium-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: var(--black); padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; margin-bottom: 1rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+.premium-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.premium-description { color: var(--gray-light); margin-bottom: 1.5rem; max-width: 300px; }
+.premium-features-list { text-align: left; margin-bottom: 1.5rem; }
+.premium-features-list li { color: var(--gray-light); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.premium-features-list li::before { content: '✓'; color: var(--secondary); font-weight: bold; }
+.upgrade-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: var(--black); padding: 0.75rem 2rem; border-radius: var(--radius-md); font-weight: 700; font-size: 1rem; transition: var(--transition); }
+.upgrade-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4); }
+.premium-note { font-size: 0.75rem; color: var(--gray); margin-top: 1rem; }
+
+/* ==================== LANDING PREMIUM SECTION ==================== */
+.landing-premium { padding: 4rem 10%; text-align: center; background: linear-gradient(180deg, var(--dark) 0%, #0a0a12 100%); }
+.landing-premium h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+.premium-demo-container { max-width: 600px; margin: 2rem auto 0; }
+.premium-demo-container .premium-preview { border-radius: var(--radius-lg); border: 1px solid var(--gray-dark); min-height: 500px; }
+.premium-demo-container .premium-overlay { position: relative; background: rgba(0,0,0,0.85); }
+.premium-demo-container .premium-3d-mockup { margin-bottom: 0; height: 150px; }
+.demo-preview-footer { text-align: center; padding: 1.5rem; border-top: 1px solid var(--gray-dark); background: var(--gray-dark); }
+.demo-preview-footer p { color: var(--gray-light); margin-bottom: 1rem; }
+
+/* ==================== FLOATING FEATURE REQUEST BUTTON ==================== */
+.feature-request-btn { position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border-radius: 50px; font-weight: 600; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4); transition: all 0.3s ease; z-index: 1000; }
+.feature-request-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5); }
+.feature-btn-icon { font-size: 1.1rem; }
+.feature-btn-text { white-space: nowrap; }
+@media (max-width: 600px) { .feature-request-btn { padding: 0.6rem 1rem; font-size: 0.8rem; bottom: 16px; right: 16px; } }

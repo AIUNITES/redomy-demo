@@ -48,6 +48,41 @@
         <div class="items-grid" id="landing-items-grid"></div>
       </section>
 
+      <!-- Premium Preview Section -->
+      <section class="landing-premium">
+        <h2>🚀 Coming Soon: Premium Features</h2>
+        <p class="section-subtitle">See what's possible with Redomy Premium</p>
+        <div class="premium-demo-container">
+          <div class="premium-feature">
+            <div class="premium-preview">
+              <div class="premium-3d-mockup">
+                <div class="room-3d">
+                  <div class="room-wall-back"></div>
+                  <div class="room-floor"></div>
+                  <div class="room-furniture"></div>
+                  <div class="room-furniture-2"></div>
+                  <div class="room-window"></div>
+                </div>
+              </div>
+              <div class="premium-overlay">
+                <span class="premium-badge">⭐ PREMIUM FEATURE</span>
+                <h3 class="premium-title">3D Room Visualization</h3>
+                <p class="premium-description">Upload a photo of your room and our AI creates an interactive 3D model</p>
+                <ul class="premium-features-list">
+                  <li>AI-powered room scanning</li>
+                  <li>Drag & drop furniture</li>
+                  <li>Shop items from Amazon</li>
+                  <li>Before/after comparison</li>
+                  <li>Share with contractors</li>
+                </ul>
+                <button class="upgrade-btn" id="landing-premium-btn">🎉 Get Early Access</button>
+                <p class="premium-note">Join the waitlist for $9.99/month launch pricing</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="landing-cta">
         <h2>Ready to transform your home?</h2>
         <p>Join homeowners tracking their renovation journey.</p>
@@ -422,6 +457,49 @@
       </div>
     </div>
 
+    <!-- 3D Demo Preview Modal -->
+    <div id="demo-preview-modal" class="modal">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2>🎨 3D Room Visualization</h2>
+          <button class="modal-close" id="close-demo-preview-modal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="premium-feature">
+            <div class="premium-preview">
+              <div class="premium-3d-mockup">
+                <div class="room-3d">
+                  <div class="room-wall-back"></div>
+                  <div class="room-floor"></div>
+                  <div class="room-furniture"></div>
+                  <div class="room-furniture-2"></div>
+                  <div class="room-window"></div>
+                </div>
+              </div>
+              <div class="premium-overlay">
+                <span class="premium-badge">⭐ PREMIUM FEATURE</span>
+                <h3 class="premium-title">3D Room Visualization</h3>
+                <p class="premium-description">Upload a photo of your room and our AI creates an interactive 3D model</p>
+                <ul class="premium-features-list">
+                  <li>AI-powered room scanning</li>
+                  <li>Drag & drop furniture</li>
+                  <li>Shop items from Amazon</li>
+                  <li>Before/after comparison</li>
+                  <li>Share with contractors</li>
+                </ul>
+                <button class="upgrade-btn" id="demo-preview-signup">🚀 Get Started Free</button>
+                <p class="premium-note">Premium starts at $9.99/month</p>
+              </div>
+            </div>
+          </div>
+          <div class="demo-preview-footer">
+            <p>Want to explore the free features first?</p>
+            <button class="btn-secondary" id="demo-preview-login">👁️ Continue to Demo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Legal Modal (Terms & Privacy) -->
     <div id="legal-modal" class="modal">
       <div class="modal-content modal-large">
@@ -443,6 +521,12 @@
 
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
+
+    <!-- Floating Feature Request Button -->
+    <a href="https://github.com/AIUNITES/redomy-demo/issues/new?title=Feature%20Request:&labels=enhancement" target="_blank" class="feature-request-btn">
+      <span class="feature-btn-icon">💡</span>
+      <span class="feature-btn-text">Request Feature</span>
+    </a>
   </div>
 
   <script src="js/config.js"></script>

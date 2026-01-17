@@ -1,6 +1,6 @@
 /**
  * Redomy - Redo My Home
- * Main App JS with Admin Panel and Legal Modals
+ * Main App JS with Task List, 3D Premium Preview on Landing Page
  */
 
 const App = {
@@ -17,150 +17,81 @@ const App = {
     document.title = `${APP_CONFIG.name} - ${APP_CONFIG.tagline}`;
     document.querySelectorAll('.logo').forEach(el => el.innerHTML = APP_CONFIG.logoHtml);
     document.querySelectorAll('.hero-slogan, .auth-tagline, .footer-slogan').forEach(el => el.textContent = APP_CONFIG.tagline);
-    
     const heroContent = document.querySelector('.hero-content h1');
     if (heroContent) heroContent.innerHTML = APP_CONFIG.headline;
-    
     const heroSubtitle = document.querySelector('.hero-subtitle');
     if (heroSubtitle) heroSubtitle.textContent = APP_CONFIG.description;
-    
     const ctaHeadline = document.querySelector('.landing-cta h2');
     if (ctaHeadline) ctaHeadline.textContent = APP_CONFIG.ctaHeadline;
-    
     const ctaDesc = document.querySelector('.landing-cta p');
     if (ctaDesc) ctaDesc.textContent = APP_CONFIG.ctaDescription;
-    
     const itemsTitle = document.getElementById('items-section-title');
     if (itemsTitle) itemsTitle.textContent = APP_CONFIG.itemsSectionTitle;
-    
     const itemsSubtitle = document.getElementById('items-section-subtitle');
     if (itemsSubtitle) itemsSubtitle.textContent = APP_CONFIG.itemsSectionSubtitle;
-    
     const myItemsTitle = document.getElementById('my-items-title');
     if (myItemsTitle) myItemsTitle.textContent = `My ${APP_CONFIG.itemNamePlural.charAt(0).toUpperCase() + APP_CONFIG.itemNamePlural.slice(1)}`;
-    
     const myItemsSubtitle = document.getElementById('my-items-subtitle');
     if (myItemsSubtitle) myItemsSubtitle.textContent = `Manage your ${APP_CONFIG.itemNamePlural}`;
-    
     const newItemBtnText = document.getElementById('new-item-btn-text');
     if (newItemBtnText) newItemBtnText.textContent = APP_CONFIG.newItemButtonText;
-    
     const emptyIcon = document.getElementById('empty-icon');
     if (emptyIcon) emptyIcon.textContent = APP_CONFIG.emptyIcon;
-    
     const emptyTitle = document.getElementById('empty-title');
     if (emptyTitle) emptyTitle.textContent = APP_CONFIG.emptyTitle;
-    
     const emptyDesc = document.getElementById('empty-description');
     if (emptyDesc) emptyDesc.textContent = APP_CONFIG.emptyDescription;
-    
     const emptyBtnText = document.getElementById('empty-new-item-btn-text');
     if (emptyBtnText) emptyBtnText.textContent = `Create First ${APP_CONFIG.itemName.charAt(0).toUpperCase() + APP_CONFIG.itemName.slice(1)}`;
   },
 
-  checkAuth() {
-    if (Auth.isLoggedIn()) this.showDashboard();
-    else this.showLandingPage();
-  },
+  checkAuth() { if (Auth.isLoggedIn()) this.showDashboard(); else this.showLandingPage(); },
 
   bindEvents() {
-    // Landing page
     document.getElementById('landing-login-btn')?.addEventListener('click', () => this.showAuthScreen());
     document.getElementById('landing-start-btn')?.addEventListener('click', () => this.showAuthScreen('signup'));
     document.getElementById('landing-start-btn-2')?.addEventListener('click', () => this.showAuthScreen('signup'));
     document.getElementById('landing-demo-btn')?.addEventListener('click', () => this.loginAsDemo());
+    document.getElementById('landing-premium-btn')?.addEventListener('click', () => { this.showToast('You\'re on the waitlist! 🎉', 'success'); this.showAuthScreen('signup'); });
     document.getElementById('auth-demo-btn')?.addEventListener('click', () => this.loginAsDemo());
-
-    // Auth tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => this.switchAuthTab(e.target.dataset.tab));
-    });
-
-    // Back to landing
+    document.querySelectorAll('.auth-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchAuthTab(e.target.dataset.tab)));
     document.getElementById('back-to-landing')?.addEventListener('click', (e) => { e.preventDefault(); this.showLandingPage(); });
-
-    // Auth forms
     document.getElementById('login-form')?.addEventListener('submit', (e) => this.handleLogin(e));
     document.getElementById('signup-form')?.addEventListener('submit', (e) => this.handleSignup(e));
     document.getElementById('reset-app-link')?.addEventListener('click', (e) => this.resetAppToDefaults(e));
-
-    // User menu
     document.querySelector('.user-menu')?.addEventListener('click', (e) => { e.stopPropagation(); this.toggleUserMenu(); });
     document.getElementById('logout-link')?.addEventListener('click', (e) => this.handleLogout(e));
     document.getElementById('settings-link')?.addEventListener('click', (e) => this.openSettings(e));
-
-    // Dashboard navigation
-    document.querySelectorAll('.nav-tab[data-view]').forEach(tab => {
-      tab.addEventListener('click', (e) => this.switchDashboardView(e.target.dataset.view));
-    });
-
-    // New item buttons
+    document.querySelectorAll('.nav-tab[data-view]').forEach(tab => tab.addEventListener('click', (e) => this.switchDashboardView(e.target.dataset.view)));
     document.getElementById('new-item-btn')?.addEventListener('click', () => this.openCreateModal());
     document.getElementById('empty-new-item-btn')?.addEventListener('click', () => this.openCreateModal());
-
-    // Create modal
     document.getElementById('close-create-modal')?.addEventListener('click', () => this.closeCreateModal());
     document.getElementById('create-form')?.addEventListener('submit', (e) => this.handleCreateSubmit(e));
-
-    // Item modal
     document.getElementById('close-item-modal')?.addEventListener('click', () => this.closeItemModal());
-
-    // Settings modal
     document.getElementById('close-settings-modal')?.addEventListener('click', () => this.closeSettingsModal());
     document.getElementById('cancel-settings')?.addEventListener('click', () => this.closeSettingsModal());
     document.getElementById('user-settings-form')?.addEventListener('submit', (e) => this.handleSettingsSubmit(e));
     document.getElementById('backup-data-btn')?.addEventListener('click', () => this.backupUserData());
     document.getElementById('restore-data-input')?.addEventListener('change', (e) => this.restoreUserData(e));
-
-    // Cache viewer
     document.getElementById('view-cache-btn')?.addEventListener('click', () => this.openCacheViewer());
     document.getElementById('close-cache-modal')?.addEventListener('click', () => this.closeCacheModal());
-    document.querySelectorAll('.cache-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => this.switchCacheTab(e.target.dataset.cacheTab));
-    });
+    document.querySelectorAll('.cache-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchCacheTab(e.target.dataset.cacheTab)));
     document.getElementById('clear-my-cache-btn')?.addEventListener('click', () => this.clearMyCache());
-
-    // Close dropdowns on outside click
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.user-menu')) document.getElementById('user-dropdown')?.classList.remove('active');
-    });
-
-    // Admin panel
+    document.addEventListener('click', (e) => { if (!e.target.closest('.user-menu')) document.getElementById('user-dropdown')?.classList.remove('active'); });
     document.getElementById('admin-link')?.addEventListener('click', (e) => this.openAdminPanel(e));
     document.getElementById('close-admin-modal')?.addEventListener('click', () => this.closeAdminModal());
-    document.querySelectorAll('.admin-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => this.switchAdminTab(e.target.dataset.adminTab));
-    });
+    document.querySelectorAll('.admin-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchAdminTab(e.target.dataset.adminTab)));
     document.getElementById('admin-export-btn')?.addEventListener('click', () => this.exportAllData());
     document.getElementById('admin-reset-btn')?.addEventListener('click', () => this.resetAllData());
-
-    // Legal modal - footer links
     document.getElementById('footer-terms-link')?.addEventListener('click', (e) => this.showLegal(e, 'terms'));
     document.getElementById('footer-privacy-link')?.addEventListener('click', (e) => this.showLegal(e, 'privacy'));
-    // Legal modal - settings links
     document.getElementById('settings-terms-link')?.addEventListener('click', (e) => this.showLegal(e, 'terms'));
     document.getElementById('settings-privacy-link')?.addEventListener('click', (e) => this.showLegal(e, 'privacy'));
-    // Legal modal - signup links
     document.getElementById('signup-terms-link')?.addEventListener('click', (e) => this.showLegal(e, 'terms'));
     document.getElementById('signup-privacy-link')?.addEventListener('click', (e) => this.showLegal(e, 'privacy'));
-    // Legal modal - auth footer
     document.getElementById('auth-terms-link')?.addEventListener('click', (e) => this.showLegal(e, 'terms'));
-    // Legal modal close
     document.getElementById('close-legal-modal')?.addEventListener('click', () => this.closeLegalModal());
-
-    // Close modals on escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        this.closeCreateModal();
-        this.closeItemModal();
-        this.closeSettingsModal();
-        this.closeCacheModal();
-        this.closeAdminModal();
-        this.closeLegalModal();
-      }
-    });
-
-    // Modal backdrop clicks
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { this.closeCreateModal(); this.closeItemModal(); this.closeSettingsModal(); this.closeCacheModal(); this.closeAdminModal(); this.closeLegalModal(); }});
     document.getElementById('create-modal')?.addEventListener('click', (e) => { if (e.target.id === 'create-modal') this.closeCreateModal(); });
     document.getElementById('item-modal')?.addEventListener('click', (e) => { if (e.target.id === 'item-modal') this.closeItemModal(); });
     document.getElementById('settings-modal')?.addEventListener('click', (e) => { if (e.target.id === 'settings-modal') this.closeSettingsModal(); });
@@ -169,65 +100,22 @@ const App = {
     document.getElementById('legal-modal')?.addEventListener('click', (e) => { if (e.target.id === 'legal-modal') this.closeLegalModal(); });
   },
 
-  // SCREENS
-  showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId)?.classList.add('active');
-  },
-
+  showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId)?.classList.add('active'); },
   showLandingPage() { this.showScreen('landing-screen'); },
-
+  
   loadLandingContent() {
     const heroCardsEl = document.getElementById('hero-cards');
     if (heroCardsEl && APP_CONFIG.heroCards) {
-      heroCardsEl.innerHTML = APP_CONFIG.heroCards.map((card, i) => `
-        <div class="hero-card" style="background: linear-gradient(135deg, ${card.color}, ${this.adjustColor(card.color, -30)}); transform: rotate(${(i-1) * 6}deg) translateY(${i * 10}px);">
-          <span class="hero-card-icon">${card.icon}</span>
-          <span class="hero-card-name">${card.name}</span>
-          <span class="hero-card-subs">${card.subtitle}</span>
-        </div>
-      `).join('');
+      heroCardsEl.innerHTML = APP_CONFIG.heroCards.map((card, i) => `<div class="hero-card" style="background: linear-gradient(135deg, ${card.color}, ${this.adjustColor(card.color, -30)}); transform: rotate(${(i-1) * 6}deg) translateY(${i * 10}px);"><span class="hero-card-icon">${card.icon}</span><span class="hero-card-name">${card.name}</span><span class="hero-card-subs">${card.subtitle}</span></div>`).join('');
     }
-
     const featuresGrid = document.getElementById('features-grid');
-    if (featuresGrid && APP_CONFIG.features) {
-      featuresGrid.innerHTML = APP_CONFIG.features.map(feature => `
-        <div class="feature-card">
-          <div class="feature-icon">${feature.icon}</div>
-          <h3>${feature.title}</h3>
-          <p>${feature.description}</p>
-        </div>
-      `).join('');
-    }
-
+    if (featuresGrid && APP_CONFIG.features) featuresGrid.innerHTML = APP_CONFIG.features.map(f => `<div class="feature-card"><div class="feature-icon">${f.icon}</div><h3>${f.title}</h3><p>${f.description}</p></div>`).join('');
     const itemsGrid = document.getElementById('landing-items-grid');
-    if (itemsGrid && APP_CONFIG.demoItems) {
-      itemsGrid.innerHTML = APP_CONFIG.demoItems.slice(0, 3).map(item => `
-        <div class="item-card">
-          <div class="item-card-header" style="background: linear-gradient(135deg, ${item.color}, ${this.adjustColor(item.color, -30)});">
-            ${item.icon}
-          </div>
-          <div class="item-card-body">
-            <h3 class="item-card-title">${this.escapeHtml(item.name)}</h3>
-            <p class="item-card-desc">${this.escapeHtml(item.description || '')}</p>
-          </div>
-        </div>
-      `).join('');
-    }
+    if (itemsGrid && APP_CONFIG.demoItems) itemsGrid.innerHTML = APP_CONFIG.demoItems.slice(0, 3).map(item => `<div class="item-card"><div class="item-card-header" style="background: linear-gradient(135deg, ${item.color}, ${this.adjustColor(item.color, -30)});">${item.icon}</div><div class="item-card-body"><h3 class="item-card-title">${this.escapeHtml(item.name)}</h3><p class="item-card-desc">${this.escapeHtml(item.description || '')}</p></div></div>`).join('');
   },
 
-  showAuthScreen(tab = 'login') {
-    this.showScreen('auth-screen');
-    this.switchAuthTab(tab);
-  },
-
-  showDashboard() {
-    this.showScreen('dashboard-screen');
-    this.updateUserInfo();
-    this.loadItems();
-    this.loadDiscoverItems();
-    this.updateStats();
-  },
+  showAuthScreen(tab = 'login') { this.showScreen('auth-screen'); this.switchAuthTab(tab); },
+  showDashboard() { this.showScreen('dashboard-screen'); this.updateUserInfo(); this.loadItems(); this.loadDiscoverItems(); this.updateStats(); },
 
   // AUTH
   switchAuthTab(tab) {
@@ -241,81 +129,35 @@ const App = {
 
   handleLogin(e) {
     e.preventDefault();
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-    try {
-      Auth.login(username, password);
-      this.showToast('Welcome back!', 'success');
-      this.showDashboard();
-    } catch (error) {
-      document.getElementById('login-error').textContent = error.message;
-    }
+    try { Auth.login(document.getElementById('login-username').value.trim(), document.getElementById('login-password').value); this.showToast('Welcome back!', 'success'); this.showDashboard(); }
+    catch (error) { document.getElementById('login-error').textContent = error.message; }
   },
 
   handleSignup(e) {
     e.preventDefault();
-    const displayName = document.getElementById('signup-name').value.trim();
-    const username = document.getElementById('signup-username').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const confirm = document.getElementById('signup-confirm').value;
     const terms = document.getElementById('signup-terms')?.checked;
-
-    if (!terms) {
-      document.getElementById('signup-error').textContent = 'You must agree to the Terms of Service and Privacy Policy';
-      return;
-    }
-    if (password !== confirm) {
-      document.getElementById('signup-error').textContent = 'Passwords do not match';
-      return;
-    }
-    try {
-      Auth.signup(displayName, username, email, password);
-      this.showToast(`Welcome to ${APP_CONFIG.name}!`, 'success');
-      this.showDashboard();
-    } catch (error) {
-      document.getElementById('signup-error').textContent = error.message;
-    }
+    if (!terms) { document.getElementById('signup-error').textContent = 'You must agree to the Terms of Service and Privacy Policy'; return; }
+    if (document.getElementById('signup-password').value !== document.getElementById('signup-confirm').value) { document.getElementById('signup-error').textContent = 'Passwords do not match'; return; }
+    try { Auth.signup(document.getElementById('signup-name').value.trim(), document.getElementById('signup-username').value.trim(), document.getElementById('signup-email').value.trim(), document.getElementById('signup-password').value); this.showToast(`Welcome to ${APP_CONFIG.name}!`, 'success'); this.showDashboard(); }
+    catch (error) { document.getElementById('signup-error').textContent = error.message; }
   },
 
-  handleLogout(e) {
-    e.preventDefault();
-    Auth.logout();
-    this.showToast('Logged out successfully', 'success');
-    this.showAuthScreen();
-    document.getElementById('login-form').reset();
-    document.getElementById('signup-form').reset();
-  },
-
+  handleLogout(e) { e.preventDefault(); Auth.logout(); this.showToast('Logged out', 'success'); this.showAuthScreen(); document.getElementById('login-form').reset(); document.getElementById('signup-form').reset(); },
+  
   loginAsDemo() {
-    try {
-      Auth.login('demo', 'demo123');
-      this.showToast('Welcome to the demo! Explore freely.', 'success');
-      this.showDashboard();
-    } catch (error) {
-      Storage.clearAll();
-      Auth.login('demo', 'demo123');
-      this.showToast('Welcome to the demo! Explore freely.', 'success');
-      this.showDashboard();
-    }
+    try { Auth.login('demo', 'demo123'); } catch { Storage.clearAll(); Auth.login('demo', 'demo123'); }
+    this.showToast('Welcome to the demo!', 'success'); this.showDashboard();
   },
 
   resetAppToDefaults(e) {
     e.preventDefault();
-    const password = prompt('Enter admin password to reset:');
-    if (password !== APP_CONFIG.defaultAdmin.password) {
-      this.showToast('Incorrect admin password', 'error');
-      return;
-    }
-    if (!confirm('⚠️ Reset app to defaults? This will delete all data.')) return;
-    Storage.clearAll();
-    this.showToast('App reset! Login with admin / admin123', 'success');
-    document.getElementById('login-form').reset();
-    document.getElementById('signup-form').reset();
+    if (prompt('Admin password:') !== APP_CONFIG.defaultAdmin.password) { this.showToast('Incorrect password', 'error'); return; }
+    if (!confirm('Reset all data?')) return;
+    Storage.clearAll(); this.showToast('App reset!', 'success'); document.getElementById('login-form').reset();
   },
 
   toggleUserMenu() { document.getElementById('user-dropdown')?.classList.toggle('active'); },
-
+  
   updateUserInfo() {
     const user = Auth.getCurrentUser();
     if (user) {
@@ -326,7 +168,6 @@ const App = {
     }
   },
 
-  // DASHBOARD
   switchDashboardView(view) {
     document.querySelectorAll('.nav-tab[data-view]').forEach(t => t.classList.remove('active'));
     document.querySelector(`.nav-tab[data-view="${view}"]`)?.classList.add('active');
@@ -335,575 +176,222 @@ const App = {
   },
 
   loadItems() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
+    const user = Auth.getCurrentUser(); if (!user) return;
     const items = Storage.getUserItems(user.id);
     const grid = document.getElementById('items-grid');
     const emptyState = document.getElementById('empty-items');
-    if (items.length === 0) {
-      grid.innerHTML = '';
-      emptyState?.classList.add('active');
-      return;
-    }
+    if (items.length === 0) { grid.innerHTML = ''; emptyState?.classList.add('active'); return; }
     emptyState?.classList.remove('active');
     grid.innerHTML = items.map(item => this.renderDefaultItemCard(item)).join('');
   },
 
   renderDefaultItemCard(item) {
     const isFav = Storage.isFavorite(Auth.getCurrentUser()?.id, item.id);
-    return `
-      <div class="item-card" data-id="${item.id}">
-        <div class="item-card-header" style="background: linear-gradient(135deg, ${item.color || '#3b82f6'}, ${this.adjustColor(item.color || '#3b82f6', -30)});">
-          ${item.icon || '🏠'}
-          <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); App.toggleFavorite('${item.id}')">
-            ${isFav ? '⭐' : '☆'}
-          </button>
-        </div>
-        <div class="item-card-body">
-          <h3 class="item-card-title">${this.escapeHtml(item.name)}</h3>
-          <p class="item-card-desc">${this.escapeHtml(item.description || '')}</p>
-          <div class="item-card-actions">
-            <button class="item-action-view" onclick="App.openItemModal('${item.id}')">👁️ View</button>
-            <button class="item-action-edit" onclick="App.openCreateModal('${item.id}')">✏️ Edit</button>
-            <button class="item-action-delete" onclick="App.deleteItem('${item.id}')">🗑️</button>
-          </div>
-        </div>
-      </div>
-    `;
+    const taskCount = item.tasks ? item.tasks.length : 0;
+    const tasksDone = item.tasks ? item.tasks.filter(t => t.completed).length : 0;
+    return `<div class="item-card" data-id="${item.id}"><div class="item-card-header" style="background: linear-gradient(135deg, ${item.color || '#3b82f6'}, ${this.adjustColor(item.color || '#3b82f6', -30)});">${item.icon || '🏠'}<button class="favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); App.toggleFavorite('${item.id}')">${isFav ? '⭐' : '☆'}</button></div><div class="item-card-body"><h3 class="item-card-title">${this.escapeHtml(item.name)}</h3><p class="item-card-desc">${this.escapeHtml(item.description || '')}</p><div class="item-card-stats"><span>${item.status || 'planning'}</span>${taskCount > 0 ? `<span>✅ ${tasksDone}/${taskCount}</span>` : ''}</div><div class="item-card-actions"><button class="item-action-view" onclick="App.openItemModal('${item.id}')">👁️ View</button><button class="item-action-edit" onclick="App.openCreateModal('${item.id}')">✏️ Edit</button><button class="item-action-delete" onclick="App.deleteItem('${item.id}')">🗑️</button></div></div></div>`;
   },
 
   loadDiscoverItems() {
-    const grid = document.getElementById('discover-grid');
-    if (!grid || !APP_CONFIG.discoverItems) return;
-    grid.innerHTML = APP_CONFIG.discoverItems.map(item => `
-      <div class="item-card">
-        <div class="item-card-header" style="background: linear-gradient(135deg, ${item.color}, ${this.adjustColor(item.color, -30)});">
-          ${item.icon}
-        </div>
-        <div class="item-card-body">
-          <h3 class="item-card-title">${item.name}</h3>
-          <p class="item-card-desc">${item.description}</p>
-          ${item.stats ? `<div class="item-card-stats"><span>👀 ${(item.stats.views / 1000).toFixed(1)}k views</span><span>❤️ ${item.stats.likes}</span></div>` : ''}
-        </div>
-      </div>
-    `).join('');
+    const grid = document.getElementById('discover-grid'); if (!grid || !APP_CONFIG.discoverItems) return;
+    grid.innerHTML = APP_CONFIG.discoverItems.map(item => `<div class="item-card"><div class="item-card-header" style="background: linear-gradient(135deg, ${item.color}, ${this.adjustColor(item.color, -30)});">${item.icon}</div><div class="item-card-body"><h3 class="item-card-title">${item.name}</h3><p class="item-card-desc">${item.description}</p>${item.stats ? `<div class="item-card-stats"><span>👀 ${(item.stats.views/1000).toFixed(1)}k</span><span>❤️ ${item.stats.likes}</span></div>` : ''}</div></div>`).join('');
   },
 
   updateStats() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
+    const user = Auth.getCurrentUser(); if (!user) return;
     const items = Storage.getUserItems(user.id);
     const statsRow = document.getElementById('user-stats');
-    if (statsRow && APP_CONFIG.stats) {
-      statsRow.innerHTML = APP_CONFIG.stats.map(stat => `
-        <div class="stat-card">
-          <div class="stat-label">${stat.label}</div>
-          <div class="stat-value">${stat.getValue(items, user)}</div>
-        </div>
-      `).join('');
-    }
+    if (statsRow && APP_CONFIG.stats) statsRow.innerHTML = APP_CONFIG.stats.map(stat => `<div class="stat-card"><div class="stat-label">${stat.label}</div><div class="stat-value">${stat.getValue(items, user)}</div></div>`).join('');
   },
 
-  toggleFavorite(itemId) {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    Storage.toggleFavorite(user.id, itemId);
-    this.loadItems();
-  },
+  toggleFavorite(itemId) { const user = Auth.getCurrentUser(); if (!user) return; Storage.toggleFavorite(user.id, itemId); this.loadItems(); },
 
   // CREATE/EDIT MODAL
   openCreateModal(itemId = null) {
     this.state.editingItemId = itemId;
-    const modal = document.getElementById('create-modal');
-    const title = document.getElementById('create-modal-title');
     const form = document.getElementById('create-form');
     form.innerHTML = this.buildFormFields(itemId);
-    if (itemId) {
-      const item = Storage.getItem(itemId);
-      title.textContent = `Edit ${APP_CONFIG.itemName.charAt(0).toUpperCase() + APP_CONFIG.itemName.slice(1)}`;
-      this.populateFormFields(item);
-    } else {
-      title.textContent = `Create New ${APP_CONFIG.itemName.charAt(0).toUpperCase() + APP_CONFIG.itemName.slice(1)}`;
-    }
-    modal.classList.add('active');
+    document.getElementById('create-modal-title').textContent = itemId ? `Edit ${APP_CONFIG.itemName}` : `New ${APP_CONFIG.itemName}`;
+    if (itemId) this.populateFormFields(Storage.getItem(itemId));
+    document.getElementById('create-modal').classList.add('active');
   },
 
   buildFormFields(editingId) {
     let html = '';
-    APP_CONFIG.itemFields.forEach(field => {
-      if (field.type === 'text') {
-        html += `<div class="form-group"><label for="field-${field.id}">${field.label} ${field.required ? '*' : ''}</label><input type="text" id="field-${field.id}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></div>`;
-      } else if (field.type === 'textarea') {
-        html += `<div class="form-group"><label for="field-${field.id}">${field.label} ${field.required ? '*' : ''}</label><textarea id="field-${field.id}" placeholder="${field.placeholder || ''}" rows="3" ${field.required ? 'required' : ''}></textarea></div>`;
-      } else if (field.type === 'select') {
-        html += `<div class="form-group"><label for="field-${field.id}">${field.label}</label><select id="field-${field.id}">${field.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}</select></div>`;
-      } else if (field.type === 'iconPicker') {
-        html += `<div class="form-group"><label>${field.label}</label><div class="icon-picker" id="icon-picker-${field.id}">${field.options.map(icon => `<button type="button" class="icon-btn ${icon === field.default ? 'selected' : ''}" data-icon="${icon}" onclick="App.selectIcon('${field.id}', '${icon}')">${icon}</button>`).join('')}</div><input type="hidden" id="field-${field.id}" value="${field.default}"></div>`;
-      } else if (field.type === 'colorPicker') {
-        html += `<div class="form-group"><label>${field.label}</label><div class="color-picker" id="color-picker-${field.id}">${field.options.map(color => `<button type="button" class="color-btn ${color === field.default ? 'selected' : ''}" data-color="${color}" style="background: linear-gradient(135deg, ${color}, ${this.adjustColor(color, -30)});" onclick="App.selectColor('${field.id}', '${color}')"></button>`).join('')}</div><input type="hidden" id="field-${field.id}" value="${field.default}"></div>`;
-      }
+    APP_CONFIG.itemFields.forEach(f => {
+      if (f.type === 'text') html += `<div class="form-group"><label>${f.label}</label><input type="text" id="field-${f.id}" placeholder="${f.placeholder || ''}" ${f.required ? 'required' : ''}></div>`;
+      else if (f.type === 'textarea') html += `<div class="form-group"><label>${f.label}</label><textarea id="field-${f.id}" placeholder="${f.placeholder || ''}" rows="3"></textarea></div>`;
+      else if (f.type === 'select') html += `<div class="form-group"><label>${f.label}</label><select id="field-${f.id}">${f.options.map(o => `<option value="${o.value}">${o.label}</option>`).join('')}</select></div>`;
+      else if (f.type === 'iconPicker') html += `<div class="form-group"><label>${f.label}</label><div class="icon-picker">${f.options.map(i => `<button type="button" class="icon-btn ${i === f.default ? 'selected' : ''}" data-icon="${i}" onclick="App.selectIcon('${f.id}','${i}')">${i}</button>`).join('')}</div><input type="hidden" id="field-${f.id}" value="${f.default}"></div>`;
+      else if (f.type === 'colorPicker') html += `<div class="form-group"><label>${f.label}</label><div class="color-picker">${f.options.map(c => `<button type="button" class="color-btn ${c === f.default ? 'selected' : ''}" data-color="${c}" style="background:linear-gradient(135deg,${c},${this.adjustColor(c,-30)})" onclick="App.selectColor('${f.id}','${c}')"></button>`).join('')}</div><input type="hidden" id="field-${f.id}" value="${f.default}"></div>`;
     });
-    html += `<div class="form-actions"><button type="button" class="btn-secondary" onclick="App.closeCreateModal()">Cancel</button><button type="submit" class="btn-primary">${editingId ? 'Save Changes' : 'Create'}</button></div>`;
-    return html;
+    return html + `<div class="form-actions"><button type="button" class="btn-secondary" onclick="App.closeCreateModal()">Cancel</button><button type="submit" class="btn-primary">${editingId ? 'Save' : 'Create'}</button></div>`;
   },
 
   populateFormFields(item) {
-    APP_CONFIG.itemFields.forEach(field => {
-      const el = document.getElementById(`field-${field.id}`);
-      if (el && item[field.id] !== undefined) {
-        el.value = item[field.id];
-        if (field.type === 'iconPicker') {
-          document.querySelectorAll(`#icon-picker-${field.id} .icon-btn`).forEach(btn => {
-            btn.classList.toggle('selected', btn.dataset.icon === item[field.id]);
-          });
-        } else if (field.type === 'colorPicker') {
-          document.querySelectorAll(`#color-picker-${field.id} .color-btn`).forEach(btn => {
-            btn.classList.toggle('selected', btn.dataset.color === item[field.id]);
-          });
-        }
+    APP_CONFIG.itemFields.forEach(f => {
+      const el = document.getElementById(`field-${f.id}`);
+      if (el && item[f.id] !== undefined) {
+        el.value = item[f.id];
+        if (f.type === 'iconPicker') document.querySelectorAll('.icon-picker .icon-btn').forEach(btn => btn.classList.toggle('selected', btn.dataset.icon === item[f.id]));
+        if (f.type === 'colorPicker') document.querySelectorAll('.color-picker .color-btn').forEach(btn => btn.classList.toggle('selected', btn.dataset.color === item[f.id]));
       }
     });
   },
 
-  selectIcon(fieldId, icon) {
-    document.querySelectorAll(`#icon-picker-${fieldId} .icon-btn`).forEach(btn => {
-      btn.classList.toggle('selected', btn.dataset.icon === icon);
-    });
-    document.getElementById(`field-${fieldId}`).value = icon;
-  },
-
-  selectColor(fieldId, color) {
-    document.querySelectorAll(`#color-picker-${fieldId} .color-btn`).forEach(btn => {
-      btn.classList.toggle('selected', btn.dataset.color === color);
-    });
-    document.getElementById(`field-${fieldId}`).value = color;
-  },
-
-  closeCreateModal() {
-    document.getElementById('create-modal')?.classList.remove('active');
-    this.state.editingItemId = null;
-  },
+  selectIcon(fid, icon) { document.querySelectorAll('.icon-picker .icon-btn').forEach(b => b.classList.toggle('selected', b.dataset.icon === icon)); document.getElementById(`field-${fid}`).value = icon; },
+  selectColor(fid, color) { document.querySelectorAll('.color-picker .color-btn').forEach(b => b.classList.toggle('selected', b.dataset.color === color)); document.getElementById(`field-${fid}`).value = color; },
+  closeCreateModal() { document.getElementById('create-modal')?.classList.remove('active'); this.state.editingItemId = null; },
 
   handleCreateSubmit(e) {
     e.preventDefault();
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const itemData = { userId: user.id };
-    APP_CONFIG.itemFields.forEach(field => {
-      const el = document.getElementById(`field-${field.id}`);
-      if (el) itemData[field.id] = el.value;
-    });
-    try {
-      if (this.state.editingItemId) {
-        Storage.updateItem(this.state.editingItemId, itemData);
-        this.showToast(`${APP_CONFIG.itemName} updated!`, 'success');
-      } else {
-        Storage.createItem(itemData);
-        this.showToast(`${APP_CONFIG.itemName} created!`, 'success');
-      }
-      this.closeCreateModal();
-      this.loadItems();
-      this.updateStats();
-    } catch (error) {
-      this.showToast(error.message, 'error');
-    }
+    const user = Auth.getCurrentUser(); if (!user) return;
+    const data = { userId: user.id };
+    APP_CONFIG.itemFields.forEach(f => { const el = document.getElementById(`field-${f.id}`); if (el) data[f.id] = el.value; });
+    if (this.state.editingItemId) { Storage.updateItem(this.state.editingItemId, data); this.showToast('Updated!', 'success'); }
+    else { Storage.createItem(data); this.showToast('Created!', 'success'); }
+    this.closeCreateModal(); this.loadItems(); this.updateStats();
   },
 
-  deleteItem(itemId) {
-    if (!confirm(`Delete this ${APP_CONFIG.itemName}? This cannot be undone.`)) return;
-    try {
-      Storage.deleteItem(itemId);
-      this.showToast(`${APP_CONFIG.itemName} deleted`, 'success');
-      this.loadItems();
-      this.updateStats();
-    } catch (error) {
-      this.showToast(error.message, 'error');
-    }
-  },
+  deleteItem(itemId) { if (!confirm('Delete?')) return; Storage.deleteItem(itemId); this.showToast('Deleted', 'success'); this.loadItems(); this.updateStats(); },
 
-  // ITEM DETAIL MODAL
+  // ITEM DETAIL MODAL WITH TASKS
   openItemModal(itemId) {
-    const item = Storage.getItem(itemId);
-    if (!item) return;
-    const modal = document.getElementById('item-modal');
-    const title = document.getElementById('item-modal-title');
-    const body = document.getElementById('item-modal-body');
-    title.textContent = item.name;
-    body.innerHTML = `
+    const item = Storage.getItem(itemId); if (!item) return;
+    this.state.currentItem = item;
+    if (!item.tasks) item.tasks = [];
+    document.getElementById('item-modal-title').textContent = item.name;
+    document.getElementById('item-modal-body').innerHTML = `
       <div class="item-detail">
-        <div class="item-detail-header" style="background: linear-gradient(135deg, ${item.color || '#3b82f6'}, ${this.adjustColor(item.color || '#3b82f6', -30)});">
-          <span class="item-detail-icon">${item.icon || '🏠'}</span>
+        <div class="item-detail-header" style="background: linear-gradient(135deg, ${item.color || '#3b82f6'}, ${this.adjustColor(item.color || '#3b82f6', -30)});"><span class="item-detail-icon">${item.icon || '🏠'}</span></div>
+        <div class="detail-tabs">
+          <button class="detail-tab active" data-detail-tab="info">📋 Details</button>
+          <button class="detail-tab" data-detail-tab="tasks">✅ Tasks</button>
+          <button class="detail-tab" data-detail-tab="3d">🎨 3D View</button>
         </div>
-        <div class="item-detail-body">
-          <h2>${this.escapeHtml(item.name)}</h2>
-          <p>${this.escapeHtml(item.description || 'No description')}</p>
-          <div class="item-detail-meta">
-            <span>Created: ${this.formatDate(item.createdAt)}</span>
-            <span>Updated: ${this.formatDate(item.updatedAt)}</span>
+        <div id="detail-info-tab" class="detail-tab-content active">
+          <div class="item-detail-body">
+            <h2>${this.escapeHtml(item.name)}</h2>
+            <p>${this.escapeHtml(item.description || 'No description')}</p>
+            <div class="item-detail-meta"><span>Room: ${item.room || 'Not set'}</span><span>Status: ${item.status || 'Not set'}</span><span>Budget: ${item.budget ? '$' + parseInt(item.budget).toLocaleString() : 'Not set'}</span></div>
+            <div class="item-detail-meta" style="margin-top:0.5rem"><span>Created: ${this.formatDate(item.createdAt)}</span><span>Updated: ${this.formatDate(item.updatedAt)}</span></div>
           </div>
         </div>
-      </div>
-    `;
-    modal.classList.add('active');
+        <div id="detail-tasks-tab" class="detail-tab-content">
+          <div class="task-section">
+            <div class="task-header"><h4>📋 Project Tasks</h4></div>
+            <div class="task-list" id="task-list">${this.renderTasks(item.tasks)}</div>
+            ${this.renderTaskProgress(item.tasks)}
+            <div class="add-task-form"><input type="text" id="new-task-name" placeholder="Add a task..."><input type="date" id="new-task-due"><button type="button" class="add-task-btn" onclick="App.addTask()">+ Add</button></div>
+          </div>
+        </div>
+        <div id="detail-3d-tab" class="detail-tab-content">
+          <div class="premium-feature"><div class="premium-preview">
+            <div class="premium-3d-mockup"><div class="room-3d"><div class="room-wall-back"></div><div class="room-floor"></div><div class="room-furniture"></div><div class="room-furniture-2"></div><div class="room-window"></div></div></div>
+            <div class="premium-overlay">
+              <span class="premium-badge">⭐ PREMIUM</span>
+              <h3 class="premium-title">3D Room Visualization</h3>
+              <p class="premium-description">Upload a photo of your room and our AI creates an interactive 3D model</p>
+              <ul class="premium-features-list"><li>AI-powered room scanning</li><li>Drag & drop furniture</li><li>Shop items from Amazon</li><li>Before/after comparison</li><li>Share with contractors</li></ul>
+              <button class="upgrade-btn" onclick="App.showUpgradeModal()">🚀 Upgrade to Premium</button>
+              <p class="premium-note">Starting at $9.99/month</p>
+            </div>
+          </div></div>
+        </div>
+      </div>`;
+    document.getElementById('item-modal-body').querySelectorAll('.detail-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchDetailTab(e.target.dataset.detailTab)));
+    document.getElementById('item-modal').classList.add('active');
   },
 
+  switchDetailTab(tab) {
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.detail-tab[data-detail-tab="${tab}"]`)?.classList.add('active');
+    document.querySelectorAll('.detail-tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`detail-${tab}-tab`)?.classList.add('active');
+  },
+
+  renderTasks(tasks) {
+    if (!tasks || tasks.length === 0) return `<div class="empty-tasks"><div class="empty-tasks-icon">📝</div><p>No tasks yet. Add your first task below!</p></div>`;
+    return tasks.map((t, i) => `<div class="task-item ${t.completed ? 'completed' : ''}"><input type="checkbox" class="task-checkbox" ${t.completed ? 'checked' : ''} onchange="App.toggleTask(${i})"><div class="task-info"><div class="task-name">${this.escapeHtml(t.name)}</div>${t.dueDate ? `<div class="task-due ${this.getTaskDueClass(t.dueDate)}">${this.formatTaskDue(t.dueDate)}</div>` : ''}</div><button class="task-delete" onclick="App.deleteTask(${i})">×</button></div>`).join('');
+  },
+
+  renderTaskProgress(tasks) {
+    if (!tasks || tasks.length === 0) return '';
+    const done = tasks.filter(t => t.completed).length, total = tasks.length, pct = Math.round((done/total)*100);
+    return `<div class="task-progress"><div class="task-progress-bar"><div class="task-progress-fill" style="width:${pct}%"></div></div><div class="task-progress-text">${done} of ${total} complete (${pct}%)</div></div>`;
+  },
+
+  getTaskDueClass(d) { const diff = Math.ceil((new Date(d) - new Date().setHours(0,0,0,0)) / 86400000); return diff < 0 ? 'overdue' : diff <= 3 ? 'soon' : ''; },
+  formatTaskDue(d) { const diff = Math.ceil((new Date(d) - new Date().setHours(0,0,0,0)) / 86400000); if (diff < 0) return `⚠️ Overdue`; if (diff === 0) return '📅 Today'; if (diff === 1) return '📅 Tomorrow'; if (diff <= 7) return `📅 ${diff} days`; return `📅 ${this.formatDate(d)}`; },
+
+  addTask() {
+    const name = document.getElementById('new-task-name').value.trim(); if (!name) return;
+    const item = this.state.currentItem;
+    if (!item.tasks) item.tasks = [];
+    item.tasks.push({ name, dueDate: document.getElementById('new-task-due').value || null, completed: false });
+    Storage.updateItem(item.id, { tasks: item.tasks });
+    document.getElementById('task-list').innerHTML = this.renderTasks(item.tasks);
+    const p = document.querySelector('.task-progress'); if (p) p.outerHTML = this.renderTaskProgress(item.tasks); else document.getElementById('task-list').insertAdjacentHTML('afterend', this.renderTaskProgress(item.tasks));
+    document.getElementById('new-task-name').value = ''; document.getElementById('new-task-due').value = '';
+    this.showToast('Task added!', 'success'); this.loadItems();
+  },
+
+  toggleTask(i) {
+    const item = this.state.currentItem; if (!item.tasks?.[i]) return;
+    item.tasks[i].completed = !item.tasks[i].completed;
+    Storage.updateItem(item.id, { tasks: item.tasks });
+    document.getElementById('task-list').innerHTML = this.renderTasks(item.tasks);
+    const p = document.querySelector('.task-progress'); if (p) p.outerHTML = this.renderTaskProgress(item.tasks);
+    this.loadItems();
+  },
+
+  deleteTask(i) {
+    const item = this.state.currentItem; if (!item.tasks) return;
+    item.tasks.splice(i, 1);
+    Storage.updateItem(item.id, { tasks: item.tasks });
+    document.getElementById('task-list').innerHTML = this.renderTasks(item.tasks);
+    const p = document.querySelector('.task-progress'); if (p) p.outerHTML = this.renderTaskProgress(item.tasks);
+    this.showToast('Task removed', 'success'); this.loadItems();
+  },
+
+  showUpgradeModal() { this.showToast('Premium coming soon! 🚀', 'success'); },
   closeItemModal() { document.getElementById('item-modal')?.classList.remove('active'); },
 
   // SETTINGS
-  openSettings(e) {
-    e?.preventDefault();
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    document.getElementById('settings-name').value = user.displayName;
-    document.getElementById('settings-email').value = user.email || '';
-    document.getElementById('settings-modal').classList.add('active');
-    document.getElementById('user-dropdown')?.classList.remove('active');
-  },
-
+  openSettings(e) { e?.preventDefault(); const user = Auth.getCurrentUser(); if (!user) return; document.getElementById('settings-name').value = user.displayName; document.getElementById('settings-email').value = user.email || ''; document.getElementById('settings-modal').classList.add('active'); document.getElementById('user-dropdown')?.classList.remove('active'); },
   closeSettingsModal() { document.getElementById('settings-modal')?.classList.remove('active'); },
+  handleSettingsSubmit(e) { e.preventDefault(); try { Auth.updateProfile({ displayName: document.getElementById('settings-name').value.trim(), email: document.getElementById('settings-email').value.trim() }); this.updateUserInfo(); this.closeSettingsModal(); this.showToast('Saved!', 'success'); } catch (err) { this.showToast(err.message, 'error'); }},
+  backupUserData() { const user = Auth.getCurrentUser(); if (!user) return; const backup = { version: APP_CONFIG.version, items: Storage.getUserItems(user.id), favorites: Storage.getFavorites(user.id) }; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })); a.download = `${APP_CONFIG.storagePrefix}-backup.json`; a.click(); this.showToast('Backup downloaded!', 'success'); },
+  restoreUserData(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { try { const backup = JSON.parse(ev.target.result); const user = Auth.getCurrentUser(); if (!user || !backup.items) throw new Error('Invalid'); if (!confirm(`Restore ${backup.items.length} items?`)) return; const all = Storage.getAllItems(); backup.items.forEach(item => { const id = Storage.generateId(); all[id] = { ...item, id, userId: user.id, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }; }); Storage.saveAll(Storage.KEYS.ITEMS, all); this.loadItems(); this.updateStats(); this.closeSettingsModal(); this.showToast('Restored!', 'success'); } catch (err) { this.showToast('Restore failed', 'error'); }}; reader.readAsText(file); e.target.value = ''; },
 
-  handleSettingsSubmit(e) {
-    e.preventDefault();
-    const displayName = document.getElementById('settings-name').value.trim();
-    const email = document.getElementById('settings-email').value.trim();
-    try {
-      Auth.updateProfile({ displayName, email });
-      this.updateUserInfo();
-      this.closeSettingsModal();
-      this.showToast('Settings saved!', 'success');
-    } catch (error) {
-      this.showToast(error.message, 'error');
-    }
-  },
-
-  backupUserData() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const items = Storage.getUserItems(user.id);
-    const favorites = Storage.getFavorites(user.id);
-    const backup = {
-      version: APP_CONFIG.version,
-      app: APP_CONFIG.name,
-      exportedAt: new Date().toISOString(),
-      user: { username: user.username, displayName: user.displayName, email: user.email },
-      items: items,
-      favorites: favorites
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${APP_CONFIG.storagePrefix}-backup-${user.username}-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    this.showToast('Backup downloaded!', 'success');
-  },
-
-  restoreUserData(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const backup = JSON.parse(event.target.result);
-        if (!backup.items) throw new Error('Invalid backup file');
-        const user = Auth.getCurrentUser();
-        if (!user) throw new Error('Please log in first');
-        if (!confirm(`Restore ${backup.items.length} ${APP_CONFIG.itemNamePlural}?`)) return;
-        const allItems = Storage.getAllItems();
-        backup.items.forEach(item => {
-          const newId = Storage.generateId();
-          allItems[newId] = { ...item, id: newId, userId: user.id, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-        });
-        Storage.saveAll(Storage.KEYS.ITEMS, allItems);
-        this.loadItems();
-        this.updateStats();
-        this.closeSettingsModal();
-        this.showToast(`Restored ${backup.items.length} ${APP_CONFIG.itemNamePlural}!`, 'success');
-      } catch (error) {
-        this.showToast('Restore failed: ' + error.message, 'error');
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  },
-
-  // CACHE VIEWER
-  openCacheViewer() {
-    this.loadCacheSummary();
-    this.loadCacheItems();
-    this.loadCacheRaw();
-    document.getElementById('cache-modal').classList.add('active');
-  },
-
+  // CACHE
+  openCacheViewer() { this.loadCacheSummary(); this.loadCacheItems(); this.loadCacheRaw(); document.getElementById('cache-modal').classList.add('active'); },
   closeCacheModal() { document.getElementById('cache-modal')?.classList.remove('active'); },
+  switchCacheTab(tab) { document.querySelectorAll('.cache-tab').forEach(t => t.classList.remove('active')); document.querySelector(`.cache-tab[data-cache-tab="${tab}"]`)?.classList.add('active'); document.querySelectorAll('.cache-tab-content').forEach(c => c.classList.remove('active')); document.getElementById(`cache-${tab}-tab`)?.classList.add('active'); },
+  loadCacheSummary() { const user = Auth.getCurrentUser(); if (!user) return; const items = Storage.getUserItems(user.id); document.getElementById('cache-summary-grid').innerHTML = `<div class="cache-summary-card"><div class="cache-summary-value">${items.length}</div><div class="cache-summary-label">Projects</div></div><div class="cache-summary-card"><div class="cache-summary-value">${Storage.getFavorites(user.id).length}</div><div class="cache-summary-label">Favorites</div></div>`; document.getElementById('cache-size').textContent = `Total: ${(JSON.stringify(items).length / 1024).toFixed(2)} KB`; },
+  loadCacheItems() { const user = Auth.getCurrentUser(); if (!user) return; const items = Storage.getUserItems(user.id); document.getElementById('cache-items-list').innerHTML = items.length === 0 ? '<p style="color:var(--gray);text-align:center;padding:2rem">No projects</p>' : items.map(item => `<div class="cache-item"><div class="cache-item-header"><span class="cache-item-icon">${item.icon || '🏠'}</span><span class="cache-item-title">${this.escapeHtml(item.name)}</span></div><div class="cache-item-meta"><span>ID: ${item.id}</span></div></div>`).join(''); },
+  loadCacheRaw() { const user = Auth.getCurrentUser(); if (!user) return; document.getElementById('cache-raw-view').textContent = JSON.stringify({ items: Storage.getUserItems(user.id) }, null, 2); },
+  clearMyCache() { const user = Auth.getCurrentUser(); if (!user || ['admin','demo'].includes(user.username)) { this.showToast('Cannot clear', 'error'); return; } if (!confirm('Delete all?')) return; const all = Storage.getAllItems(); Object.keys(all).forEach(id => { if (all[id].userId === user.id) delete all[id]; }); Storage.saveAll(Storage.KEYS.ITEMS, all); this.loadItems(); this.updateStats(); this.closeCacheModal(); this.closeSettingsModal(); this.showToast('Cleared', 'success'); },
 
-  switchCacheTab(tab) {
-    document.querySelectorAll('.cache-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.cache-tab[data-cache-tab="${tab}"]`)?.classList.add('active');
-    document.querySelectorAll('.cache-tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`cache-${tab}-tab`)?.classList.add('active');
-  },
-
-  loadCacheSummary() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const items = Storage.getUserItems(user.id);
-    const favorites = Storage.getFavorites(user.id);
-    const grid = document.getElementById('cache-summary-grid');
-    grid.innerHTML = `
-      <div class="cache-summary-card"><div class="cache-summary-value">${items.length}</div><div class="cache-summary-label">${APP_CONFIG.itemNamePlural}</div></div>
-      <div class="cache-summary-card"><div class="cache-summary-value">${favorites.length}</div><div class="cache-summary-label">Favorites</div></div>
-    `;
-    const totalSize = JSON.stringify(items).length / 1024;
-    document.getElementById('cache-size').textContent = `Total size: ${totalSize.toFixed(2)} KB`;
-  },
-
-  loadCacheItems() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const items = Storage.getUserItems(user.id);
-    const list = document.getElementById('cache-items-list');
-    if (items.length === 0) {
-      list.innerHTML = `<p style="color: var(--gray); text-align: center; padding: 2rem;">No ${APP_CONFIG.itemNamePlural} found</p>`;
-      return;
-    }
-    list.innerHTML = items.map(item => `
-      <div class="cache-item">
-        <div class="cache-item-header">
-          <span class="cache-item-icon">${item.icon || '🏠'}</span>
-          <span class="cache-item-title">${this.escapeHtml(item.name)}</span>
-        </div>
-        <div class="cache-item-meta"><span>ID: ${item.id}</span><span>Created: ${this.formatDate(item.createdAt)}</span></div>
-      </div>
-    `).join('');
-  },
-
-  loadCacheRaw() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    const items = Storage.getUserItems(user.id);
-    document.getElementById('cache-raw-view').textContent = JSON.stringify({ items }, null, 2);
-  },
-
-  clearMyCache() {
-    const user = Auth.getCurrentUser();
-    if (!user) return;
-    if (['admin', 'demo'].includes(user.username)) {
-      this.showToast('Cannot clear system account data', 'error');
-      return;
-    }
-    if (!confirm(`Delete all your ${APP_CONFIG.itemNamePlural}? This cannot be undone.`)) return;
-    const allItems = Storage.getAllItems();
-    Object.keys(allItems).forEach(id => {
-      if (allItems[id].userId === user.id) delete allItems[id];
-    });
-    Storage.saveAll(Storage.KEYS.ITEMS, allItems);
-    this.loadItems();
-    this.updateStats();
-    this.closeCacheModal();
-    this.closeSettingsModal();
-    this.showToast('Your content has been cleared', 'success');
-  },
-
-  // ADMIN PANEL
-  openAdminPanel(e) {
-    e?.preventDefault();
-    const user = Auth.getCurrentUser();
-    if (!user?.isAdmin) {
-      this.showToast('Admin access required', 'error');
-      return;
-    }
-    this.loadAdminStats();
-    this.loadAdminUsers();
-    this.loadChangelog();
-    document.getElementById('admin-modal').classList.add('active');
-    document.getElementById('user-dropdown')?.classList.remove('active');
-  },
-
+  // ADMIN
+  openAdminPanel(e) { e?.preventDefault(); const user = Auth.getCurrentUser(); if (!user?.isAdmin) { this.showToast('Admin only', 'error'); return; } this.loadAdminStats(); this.loadAdminUsers(); this.loadChangelog(); document.getElementById('admin-modal').classList.add('active'); document.getElementById('user-dropdown')?.classList.remove('active'); },
   closeAdminModal() { document.getElementById('admin-modal')?.classList.remove('active'); },
+  switchAdminTab(tab) { document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active')); document.querySelector(`.admin-tab[data-admin-tab="${tab}"]`)?.classList.add('active'); document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active')); document.getElementById(`admin-${tab}-tab`)?.classList.add('active'); },
+  loadAdminStats() { document.getElementById('admin-stats-grid').innerHTML = `<div class="admin-stat-card"><div class="admin-stat-value">${Object.keys(Storage.getUsers()).length}</div><div class="admin-stat-label">Users</div></div><div class="admin-stat-card"><div class="admin-stat-value">${Object.keys(Storage.getAllItems()).length}</div><div class="admin-stat-label">Projects</div></div>`; document.getElementById('admin-app-version').textContent = APP_CONFIG.version; },
+  loadAdminUsers() { document.getElementById('admin-users-list').innerHTML = Object.values(Storage.getUsers()).map(u => `<div class="user-row"><div class="user-info"><div class="user-avatar-small">${u.displayName.charAt(0).toUpperCase()}</div><div><div class="user-row-name">${this.escapeHtml(u.displayName)}</div><div class="user-row-username">@${u.username} ${u.isAdmin ? '🛡️' : ''}</div></div></div><div class="user-meta">Joined: ${this.formatDate(u.createdAt)}</div></div>`).join(''); },
+  loadChangelog() { const c = document.getElementById('changelog-content'); if (!c || !APP_CONFIG.changelog) return; c.innerHTML = APP_CONFIG.changelog.map(e => `<div class="changelog-version"><h3>${e.version} <span class="changelog-date">${e.date}</span></h3><ul>${e.changes.map(ch => `<li>${ch}</li>`).join('')}</ul></div>`).join(''); },
+  exportAllData() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(Storage.exportData(), null, 2)], { type: 'application/json' })); a.download = `${APP_CONFIG.storagePrefix}-export.json`; a.click(); this.showToast('Exported!', 'success'); },
+  resetAllData() { if (!confirm('Delete ALL?')) return; if (prompt('Admin password:') !== APP_CONFIG.defaultAdmin.password) { this.showToast('Wrong', 'error'); return; } Storage.clearAll(); this.closeAdminModal(); Auth.logout(); this.showToast('Reset!', 'success'); this.showAuthScreen(); },
 
-  switchAdminTab(tab) {
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.admin-tab[data-admin-tab="${tab}"]`)?.classList.add('active');
-    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`admin-${tab}-tab`)?.classList.add('active');
-  },
-
-  loadAdminStats() {
-    const users = Storage.getUsers();
-    const items = Storage.getAllItems();
-    const grid = document.getElementById('admin-stats-grid');
-    grid.innerHTML = `
-      <div class="admin-stat-card"><div class="admin-stat-value">${Object.keys(users).length}</div><div class="admin-stat-label">Total Users</div></div>
-      <div class="admin-stat-card"><div class="admin-stat-value">${Object.keys(items).length}</div><div class="admin-stat-label">Total ${APP_CONFIG.itemNamePlural}</div></div>
-    `;
-    document.getElementById('admin-app-version').textContent = APP_CONFIG.version;
-  },
-
-  loadAdminUsers() {
-    const users = Storage.getUsers();
-    const userList = Object.values(users);
-    const table = document.getElementById('admin-users-list');
-    table.innerHTML = userList.map(user => `
-      <div class="user-row">
-        <div class="user-info">
-          <div class="user-avatar-small">${user.displayName.charAt(0).toUpperCase()}</div>
-          <div>
-            <div class="user-row-name">${this.escapeHtml(user.displayName)}</div>
-            <div class="user-row-username">@${user.username} ${user.isAdmin ? '🛡️' : ''}</div>
-          </div>
-        </div>
-        <div class="user-meta"><span>Joined: ${this.formatDate(user.createdAt)}</span></div>
-      </div>
-    `).join('');
-  },
-
-  loadChangelog() {
-    const container = document.getElementById('changelog-content');
-    if (!container || !APP_CONFIG.changelog) return;
-    container.innerHTML = APP_CONFIG.changelog.map(entry => `
-      <div class="changelog-version">
-        <h3>${entry.version} <span class="changelog-date">${entry.date}</span></h3>
-        <ul>${entry.changes.map(change => `<li>${change}</li>`).join('')}</ul>
-      </div>
-    `).join('');
-  },
-
-  exportAllData() {
-    const data = Storage.exportData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${APP_CONFIG.storagePrefix}-full-export-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    this.showToast('Full export downloaded!', 'success');
-  },
-
-  resetAllData() {
-    if (!confirm('⚠️ This will delete ALL data for ALL users. Are you sure?')) return;
-    const password = prompt('Enter admin password to confirm:');
-    if (password !== APP_CONFIG.defaultAdmin.password) {
-      this.showToast('Incorrect password', 'error');
-      return;
-    }
-    Storage.clearAll();
-    this.closeAdminModal();
-    Auth.logout();
-    this.showToast('All data reset!', 'success');
-    this.showAuthScreen();
-  },
-
-  // LEGAL MODAL
-  showLegal(e, type) {
-    e?.preventDefault();
-    const modal = document.getElementById('legal-modal');
-    const title = document.getElementById('legal-modal-title');
-    const content = document.getElementById('legal-content');
-    
-    if (type === 'terms') {
-      title.textContent = 'Terms of Service';
-      content.innerHTML = `
-        <p class="legal-updated">Last updated: January 2026</p>
-        <h3>1. Acceptance of Terms</h3>
-        <p>By accessing and using ${APP_CONFIG.name}, you accept and agree to be bound by the terms and provision of this agreement.</p>
-        <h3>2. Description of Service</h3>
-        <p>${APP_CONFIG.name} is a home renovation project tracking application that allows users to organize and track their renovation projects.</p>
-        <h3>3. User Accounts</h3>
-        <p>You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.</p>
-        <h3>4. User Content</h3>
-        <p>You retain ownership of any content you create within the application. By using the service, you grant us permission to store and display your content as necessary to provide the service.</p>
-        <h3>5. Acceptable Use</h3>
-        <p>You agree not to use the service for any unlawful purpose or in any way that could damage, disable, or impair the service.</p>
-        <h3>6. Data Storage</h3>
-        <p>Your data is stored locally in your browser's localStorage. We do not transmit or store your data on external servers. You are responsible for backing up your own data.</p>
-        <h3>7. Disclaimers</h3>
-        <p>The service is provided "as is" without warranties of any kind, either express or implied.</p>
-        <h3>8. Limitation of Liability</h3>
-        <p>We shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.</p>
-        <h3>9. Changes to Terms</h3>
-        <p>We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of the new terms.</p>
-      `;
-    } else {
-      title.textContent = 'Privacy Policy';
-      content.innerHTML = `
-        <p class="legal-updated">Last updated: January 2026</p>
-        <h3>1. Information We Collect</h3>
-        <p>We collect information you provide directly, including:</p>
-        <ul>
-          <li>Account information (username, display name, email)</li>
-          <li>Project data you create within the app</li>
-          <li>Usage data and preferences</li>
-        </ul>
-        <h3>2. How We Use Your Information</h3>
-        <p>All data is stored locally in your browser and is used solely to provide the ${APP_CONFIG.name} service. We do not transmit your personal data to external servers.</p>
-        <h3>3. Data Storage</h3>
-        <p>Your data is stored using your browser's localStorage technology. This means:</p>
-        <ul>
-          <li>Data remains on your device</li>
-          <li>Data persists between sessions</li>
-          <li>Clearing browser data will delete your ${APP_CONFIG.name} data</li>
-        </ul>
-        <h3>4. Data Security</h3>
-        <p>While we implement reasonable security measures, no method of electronic storage is 100% secure. We encourage you to use the backup feature regularly.</p>
-        <h3>5. Your Rights</h3>
-        <p>You have the right to:</p>
-        <ul>
-          <li>Access your data through the app</li>
-          <li>Export your data using the backup feature</li>
-          <li>Delete your data at any time</li>
-        </ul>
-        <h3>6. Changes to This Policy</h3>
-        <p>We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy in the app.</p>
-      `;
-    }
-    modal.classList.add('active');
-  },
-
+  // LEGAL
+  showLegal(e, type) { e?.preventDefault(); document.getElementById('legal-modal-title').textContent = type === 'terms' ? 'Terms of Service' : 'Privacy Policy'; document.getElementById('legal-content').innerHTML = type === 'terms' ? `<p class="legal-updated">Last updated: January 2026</p><h3>1. Acceptance</h3><p>By using ${APP_CONFIG.name}, you agree to these terms.</p><h3>2. Service</h3><p>A home renovation tracking app.</p><h3>3. Accounts</h3><p>You are responsible for your account security.</p><h3>4. Content</h3><p>You own your content.</p><h3>5. Use</h3><p>Don't misuse the service.</p><h3>6. Data</h3><p>Stored locally in your browser.</p><h3>7. Disclaimer</h3><p>Provided "as is".</p><h3>8. Liability</h3><p>We're not liable for damages.</p><h3>9. Changes</h3><p>Terms may change.</p>` : `<p class="legal-updated">Last updated: January 2026</p><h3>1. Collection</h3><p>Account info and project data.</p><h3>2. Use</h3><p>Stored locally to provide service.</p><h3>3. Storage</h3><p>Browser localStorage only.</p><h3>4. Security</h3><p>Use backup feature.</p><h3>5. Rights</h3><p>Access, export, delete anytime.</p><h3>6. Changes</h3><p>Policy may update.</p>`; document.getElementById('legal-modal').classList.add('active'); },
   closeLegalModal() { document.getElementById('legal-modal')?.classList.remove('active'); },
 
-  // UTILITIES
-  showLoading(message = 'Loading...') {
-    document.getElementById('loading-message').textContent = message;
-    document.getElementById('loading-overlay').classList.add('active');
-  },
-
-  hideLoading() { document.getElementById('loading-overlay').classList.remove('active'); },
-
-  showToast(message, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span><span class="toast-message">${this.escapeHtml(message)}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.animation = 'slideIn 0.3s ease reverse';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  },
-
-  escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  },
-
-  formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined });
-  },
-
-  adjustColor(hex, amount) {
-    if (!hex) return '#3b82f6';
-    const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-    const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-    const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
-    return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
-  }
+  // UTILS
+  showToast(msg, type = 'success') { const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = `<span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span><span class="toast-message">${this.escapeHtml(msg)}</span>`; document.getElementById('toast-container').appendChild(t); setTimeout(() => { t.style.animation = 'slideIn 0.3s ease reverse'; setTimeout(() => t.remove(), 300); }, 3000); },
+  escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; },
+  formatDate(d) { const dt = new Date(d); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: dt.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined }); },
+  adjustColor(hex, amt) { if (!hex) return '#3b82f6'; const n = parseInt(hex.replace('#',''),16); return '#'+(0x1000000+Math.min(255,Math.max(0,(n>>16)+amt))*0x10000+Math.min(255,Math.max(0,((n>>8)&0xFF)+amt))*0x100+Math.min(255,Math.max(0,(n&0xFF)+amt))).toString(16).slice(1); }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
