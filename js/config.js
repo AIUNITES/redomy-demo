@@ -208,18 +208,20 @@ const APP_CONFIG = {
 
   // ============================================
   // DEFAULT USERS
+  // NOTE: These are local fallback users only.
+  // For shared admin access, use GitHub sync database.
   // ============================================
   defaultAdmin: {
-    username: 'admin',
-    password: 'admin123',
-    displayName: 'Administrator',
-    email: 'admin@redomy.com',
+    username: 'localadmin',
+    password: 'Aiu2026!LocalDev',
+    displayName: 'Local Admin',
+    email: 'localadmin@redomy.com',
     isAdmin: true
   },
   
   defaultDemo: {
     username: 'demo',
-    password: 'demo123',
+    password: 'DemoUser!2026',
     displayName: 'Demo User',
     email: 'demo@redomy.com',
     isAdmin: false
