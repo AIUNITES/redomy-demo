@@ -189,14 +189,24 @@
 - [ ] Cache viewer works
 - [ ] Admin panel works
 
+### Legal Compliance Tests
+- [ ] Single footer displayed (no duplicates)
+- [ ] Footer disclaimer text visible
+- [ ] Footer copyright with AIUNITES link
+- [ ] Privacy Policy link → aiunites-site/legal.html#privacy
+- [ ] Terms of Service link → aiunites-site/legal.html#terms
+- [ ] Signup form Terms/Privacy links open legal.html in new tab
+- [ ] Settings modal Terms/Privacy links open legal.html in new tab
+
 ---
 
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | Feb 15, 2026 | Legal compliance: centralized legal.html, removed dup footer, updated all legal links |
 | 1.0.0 | Jan 2026 | Initial release |
 
 ---
 
-*Last tested: January 24, 2026*
+*Last tested: February 15, 2026*
