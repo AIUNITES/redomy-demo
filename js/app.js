@@ -145,8 +145,13 @@ const App = {
   handleLogout(e) { e.preventDefault(); Auth.logout(); this.showToast('Logged out', 'success'); this.showAuthScreen(); document.getElementById('login-form').reset(); document.getElementById('signup-form').reset(); },
   
   loginAsDemo() {
-    try { Auth.login('demo', 'demo123'); } catch { Storage.clearAll(); Auth.login('demo', 'demo123'); }
-    this.showToast('Welcome to the demo!', 'success'); this.showDashboard();
+    try {
+      Auth.loginDemo();
+      this.showToast('Welcome to the demo!', 'success');
+      this.showDashboard();
+    } catch (e) {
+      this.showToast('Demo unavailable: ' + e.message, 'error');
+    }
   },
 
   resetAppToDefaults(e) {

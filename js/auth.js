@@ -62,6 +62,32 @@ const Auth = {
   },
 
   /**
+   * Demo login — always succeeds by resetting or creating the demo user
+   */
+  loginDemo() {
+    const demo = APP_CONFIG.defaultDemo;
+    // If demo user exists with a different password, fix it
+    const existing = Storage.getUserByUsername(demo.username);
+    if (existing) {
+      Storage.updateUser(demo.username, { password: demo.password });
+    }
+    try {
+      return this.login(demo.username, demo.password);
+    } catch (e) {
+      // User didn't exist — create it
+      const user = Storage.createUser({
+        displayName: demo.displayName,
+        username: demo.username,
+        email: demo.email,
+        password: demo.password,
+        isAdmin: demo.isAdmin
+      });
+      Storage.setCurrentUser(user.username);
+      return user;
+    }
+  },
+
+  /**
    * Logout current user
    */
   logout() {
