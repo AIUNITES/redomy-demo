@@ -125,21 +125,43 @@ const App = {
     document.getElementById(`${tab}-form`)?.classList.add('active');
     document.getElementById('login-error').textContent = '';
     document.getElementById('signup-error').textContent = '';
+    if (tab === 'signup') this.injectGeneratedPassword();
   },
 
-  handleLogin(e) {
+  injectGeneratedPassword() {
+    if (typeof PasswordUtils === 'undefined') return;
+    const pw = document.getElementById('signup-password');
+    const cf = document.getElementById('signup-confirm');
+    if (!pw || pw.value) return;
+    const v = PasswordUtils.generate();
+    pw.value = v; if (cf) cf.value = v;
+    pw.type = 'text'; if (cf) cf.type = 'text';
+    document.getElementById('pw-suggest-bar')?.remove();
+    const bar = document.createElement('div'); bar.id = 'pw-suggest-bar';
+    bar.style.cssText = 'margin-top:8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#c4b5fd;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+    bar.innerHTML = '<span>🔐 Secure password generated.</span><span style="flex:1"></span><button type="button" id="pw-copy-btn" style="background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.4);color:#e9d5ff;border-radius:6px;padding:3px 10px;font-size:0.78rem;cursor:pointer;font-family:inherit;">📋 Copy</button><button type="button" id="pw-regen-btn" style="background:rgba(139,92,246,0.25);border:1px solid rgba(139,92,246,0.4);color:#e9d5ff;border-radius:6px;padding:3px 10px;font-size:0.78rem;cursor:pointer;font-family:inherit;">🔄 New</button>';
+    pw.parentElement.appendChild(bar);
+    document.getElementById('pw-copy-btn').addEventListener('click', () => { navigator.clipboard.writeText(pw.value).then(() => { const b = document.getElementById('pw-copy-btn'); if(b){b.textContent='✅ Copied!';setTimeout(()=>{b.textContent='📋 Copy';},2000);} }); });
+    document.getElementById('pw-regen-btn').addEventListener('click', () => { const n = PasswordUtils.generate(); pw.value = n; if(cf) cf.value = n; });
+  },
+
+  async handleLogin(e) {
     e.preventDefault();
-    try { Auth.login(document.getElementById('login-username').value.trim(), document.getElementById('login-password').value); this.showToast('Welcome back!', 'success'); this.showDashboard(); }
+    const btn = e.target.querySelector('[type="submit"]'); if (btn) btn.disabled = true;
+    try { await Auth.login(document.getElementById('login-username').value.trim(), document.getElementById('login-password').value); this.showToast('Welcome back!', 'success'); this.showDashboard(); }
     catch (error) { document.getElementById('login-error').textContent = error.message; }
+    finally { if (btn) btn.disabled = false; }
   },
 
-  handleSignup(e) {
+  async handleSignup(e) {
     e.preventDefault();
     const terms = document.getElementById('signup-terms')?.checked;
     if (!terms) { document.getElementById('signup-error').textContent = 'You must agree to the Terms of Service and Privacy Policy'; return; }
     if (document.getElementById('signup-password').value !== document.getElementById('signup-confirm').value) { document.getElementById('signup-error').textContent = 'Passwords do not match'; return; }
-    try { Auth.signup(document.getElementById('signup-name').value.trim(), document.getElementById('signup-username').value.trim(), document.getElementById('signup-email').value.trim(), document.getElementById('signup-password').value); this.showToast(`Welcome to ${APP_CONFIG.name}!`, 'success'); this.showDashboard(); }
+    const btn = e.target.querySelector('[type="submit"]'); if (btn) btn.disabled = true;
+    try { await Auth.signup(document.getElementById('signup-name').value.trim(), document.getElementById('signup-username').value.trim(), document.getElementById('signup-email').value.trim(), document.getElementById('signup-password').value); this.showToast(`Welcome to ${APP_CONFIG.name}!`, 'success'); this.showDashboard(); }
     catch (error) { document.getElementById('signup-error').textContent = error.message; }
+    finally { if (btn) btn.disabled = false; }
   },
 
   handleLogout(e) { e.preventDefault(); Auth.logout(); this.showToast('Logged out', 'success'); this.showAuthScreen(); document.getElementById('login-form').reset(); document.getElementById('signup-form').reset(); },
