@@ -7,7 +7,7 @@ const Auth = {
   /**
    * Register new user
    */
-  signup(displayName, username, email, password) {
+  async signup(displayName, username, email, password) {
     if (!displayName || displayName.length < 2) {
       throw new Error('Display name must be at least 2 characters');
     }
@@ -28,13 +28,8 @@ const Auth = {
       throw new Error('Username already taken');
     }
 
-    const user = Storage.createUser({
-      displayName,
-      username,
-      email,
-      password
-    });
-
+    const passwordHash = await PasswordUtils.hash(password);
+    const user = Storage.createUser({ displayName, username, email, passwordHash });
     Storage.setCurrentUser(user.username);
     return user;
   },
@@ -42,7 +37,7 @@ const Auth = {
   /**
    * Login user
    */
-  login(username, password) {
+  async login(username, password) {
     if (!username || !password) {
       throw new Error('Please enter username and password');
     }
@@ -53,37 +48,33 @@ const Auth = {
       throw new Error('User not found');
     }
 
-    if (user.password !== password) {
-      throw new Error('Incorrect password');
+    let valid = false;
+    if (user.passwordHash) {
+      valid = await PasswordUtils.verify(password, user.passwordHash);
+    } else if (user.password) {
+      valid = (user.password === password);
+      if (valid) {
+        const migrated = await PasswordUtils.migrate(user, password);
+        Storage.updateUser(user.username, migrated);
+      }
     }
-
+    if (!valid) throw new Error('Incorrect password');
     Storage.setCurrentUser(user.username);
-    return user;
+    return Storage.getUserByUsername(user.username);
   },
 
-  /**
-   * Demo login — always succeeds by resetting or creating the demo user
-   */
-  loginDemo() {
+  async loginDemo() {
     const demo = APP_CONFIG.defaultDemo;
-    // If demo user exists with a different password, fix it
-    const existing = Storage.getUserByUsername(demo.username);
-    if (existing) {
-      Storage.updateUser(demo.username, { password: demo.password });
-    }
     try {
-      return this.login(demo.username, demo.password);
+      return await this.login(demo.username, demo.password);
     } catch (e) {
-      // User didn't exist — create it
-      const user = Storage.createUser({
-        displayName: demo.displayName,
-        username: demo.username,
-        email: demo.email,
-        password: demo.password,
-        isAdmin: demo.isAdmin
-      });
-      Storage.setCurrentUser(user.username);
-      return user;
+      if (e.message === 'User not found') {
+        const passwordHash = await PasswordUtils.hash(demo.password);
+        const user = Storage.createUser({ displayName: demo.displayName, username: demo.username, email: demo.email, passwordHash, isAdmin: demo.isAdmin });
+        Storage.setCurrentUser(user.username);
+        return user;
+      }
+      throw e;
     }
   },
 
