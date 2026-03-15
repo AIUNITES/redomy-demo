@@ -52,7 +52,7 @@ const App = {
     document.getElementById('landing-start-btn')?.addEventListener('click', () => this.showAuthScreen('signup'));
     document.getElementById('landing-start-btn-2')?.addEventListener('click', () => this.showAuthScreen('signup'));
     document.getElementById('landing-demo-btn')?.addEventListener('click', () => this.loginAsDemo());
-    document.getElementById('landing-premium-btn')?.addEventListener('click', () => { this.showToast('You\'re on the waitlist! 🎉', 'success'); this.showAuthScreen('signup'); });
+    document.getElementById('landing-premium-btn')?.addEventListener('click', () => { this.showAuthScreen('signup'); });
     document.getElementById('auth-demo-btn')?.addEventListener('click', () => this.loginAsDemo());
     document.querySelectorAll('.auth-tab').forEach(tab => tab.addEventListener('click', (e) => this.switchAuthTab(e.target.dataset.tab)));
     document.getElementById('back-to-landing')?.addEventListener('click', (e) => { e.preventDefault(); this.showLandingPage(); });
@@ -381,7 +381,7 @@ const App = {
     this.showToast('Task removed', 'success'); this.loadItems();
   },
 
-  showUpgradeModal() { this.showToast('Premium coming soon! 🚀', 'success'); },
+  showUpgradeModal() { this.showToast('Upgrade to Premium for full 3D visualization! 🚀', 'info'); },
   closeItemModal() { document.getElementById('item-modal')?.classList.remove('active'); },
 
   // SETTINGS
