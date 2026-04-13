@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Visualizer — AI 3D Room Builder | Redomy</title>
+  <meta name="description" content="Upload a photo of your room and AI instantly analyzes it. Explore interactive 3D models of kitchen, bedroom, living room, den, and garage to plan your renovation.">
+  <link rel="canonical" href="https://redomy.com/room-visualizer.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* ---- Page overrides ---- */
+    body { font-family:'Syne',-apple-system,sans-serif; background:#0a0a0a; color:#fff; }
+
+    /* ---- Nav ---- */
+    .rv-nav {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:1rem 5%; background:rgba(10,10,10,.9); backdrop-filter:blur(10px);
+      border-bottom:1px solid #2a2a2a; position:sticky; top:36px; z-index:100;
+    }
+    .rv-nav a { color:#fff; text-decoration:none; font-size:.9rem; }
+    .rv-nav a:hover { color:#3b82f6; }
+    .rv-nav-links { display:flex; gap:1.5rem; align-items:center; }
+    .rv-nav-back { color:#888; font-size:.85rem; }
+    .rv-nav-back:hover { color:#fff; }
+
+    /* ---- Hero ---- */
+    .rv-hero {
+      padding:5rem 5% 4rem; text-align:center;
+      background:radial-gradient(ellipse at 50% 0%, rgba(59,130,246,.15) 0%, transparent 70%);
+      border-bottom:1px solid #1a1a1a;
+    }
+    .rv-badge {
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.4rem 1rem; border-radius:20px; font-size:.8rem; font-weight:700;
+      background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3);
+      color:#3b82f6; margin-bottom:1.25rem; letter-spacing:.04em; text-transform:uppercase;
+    }
+    .rv-hero h1 { font-size:clamp(2rem,5vw,3.5rem); font-weight:800; line-height:1.15; margin-bottom:1rem; }
+    .rv-hero p  { color:#888; max-width:600px; margin:0 auto 2rem; font-size:1.05rem; line-height:1.7; }
+
+    /* ---- Upload zone ---- */
+    .upload-section {
+      max-width:900px; margin:0 auto; padding:2.5rem 5%;
+    }
+    .upload-zone {
+      border:2px dashed #333; border-radius:16px; padding:3rem 2rem;
+      text-align:center; cursor:pointer; transition:all .3s;
+      background:rgba(59,130,246,.03); position:relative; overflow:hidden;
+    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color:#3b82f6; background:rgba(59,130,246,.08); }
+    .upload-zone.has-image { border-style:solid; border-color:#3b82f6; padding:0; }
+    .upload-icon { font-size:3rem; margin-bottom:1rem; opacity:.6; }
+    .upload-zone h3 { font-size:1.1rem; margin-bottom:.5rem; }
+    .upload-zone p  { color:#666; font-size:.9rem; }
+    .upload-preview {
+      width:100%; max-height:400px; object-fit:cover;
+      border-radius:14px; display:none;
+    }
+    .upload-zone.has-image .upload-preview { display:block; }
+    .upload-zone.has-image .upload-placeholder { display:none; }
+    .upload-placeholder { pointer-events:none; }
+    input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+    /* ---- AI Analysis panel ---- */
+    .ai-panel {
+      max-width:900px; margin:0 auto; padding:0 5% 2rem;
+    }
+    .ai-btn {
+      display:block; width:100%; padding:1rem; border-radius:12px; border:none;
+      background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff;
+      font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer;
+      transition:all .2s; margin-bottom:1.5rem;
+    }
+    .ai-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(59,130,246,.4); }
+    .ai-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+    .ai-result {
+      background:#111; border:1px solid #222; border-radius:16px;
+      padding:1.5rem; display:none;
+    }
+    .ai-result.show { display:block; }
+    .ai-result-header {
+      display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem;
+      font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#666;
+    }
+    .ai-result-header::before { content:''; width:8px; height:8px; border-radius:50%; background:#3b82f6; display:inline-block; }
+    .ai-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.25rem; }
+    .ai-card { background:#1a1a1a; border-radius:10px; padding:1rem; }
+    .ai-card-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:#555; margin-bottom:.4rem; }
+    .ai-card-val { font-size:.95rem; font-weight:700; color:#fff; }
+    .ai-suggestions { margin-top:1rem; }
+    .ai-suggestions h4 { font-size:.85rem; color:#888; margin-bottom:.75rem; }
+    .ai-sug-item {
+      display:flex; align-items:flex-start; gap:.75rem;
+      padding:.75rem; background:#1a1a1a; border-radius:8px; margin-bottom:.5rem;
+      font-size:.88rem; color:#ccc; line-height:1.5;
+    }
+    .ai-sug-num { color:#3b82f6; font-weight:800; font-size:.9rem; flex-shrink:0; }
+    .ai-loading {
+      text-align:center; padding:2rem; color:#666; display:none;
+    }
+    .ai-loading.show { display:block; }
+    .ai-spinner { width:32px; height:32px; border:3px solid #222; border-top-color:#3b82f6; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto .75rem; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .ai-error { color:#ef4444; padding:.75rem 1rem; background:rgba(239,68,68,.08); border-radius:8px; font-size:.88rem; display:none; }
+    .ai-error.show { display:block; }
+
+    /* ---- Room gallery ---- */
+    .rooms-section { padding:3rem 5%; max-width:1300px; margin:0 auto; }
+    .rooms-title { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#555; margin-bottom:.5rem; }
+    .rooms-heading { font-size:clamp(1.6rem,4vw,2.2rem); font-weight:800; margin-bottom:.75rem; }
+    .rooms-sub { color:#666; max-width:560px; font-size:.95rem; line-height:1.6; margin-bottom:2rem; }
+
+    /* Room tabs */
+    .room-tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+    .room-tab {
+      padding:.6rem 1.2rem; border-radius:10px; border:1px solid #222;
+      background:#111; color:#666; font-size:.88rem; font-weight:600;
+      cursor:pointer; transition:all .2s; font-family:inherit;
+    }
+    .room-tab:hover { border-color:#3b82f6; color:#3b82f6; }
+    .room-tab.active { background:#3b82f6; border-color:#3b82f6; color:#fff; }
+
+    /* 3D viewer */
+    .room-viewer-wrap {
+      display:grid; grid-template-columns:2fr 1fr; gap:1.5rem; align-items:start;
+    }
+    @media(max-width:800px){ .room-viewer-wrap{grid-template-columns:1fr;} }
+
+    .room-canvas-card {
+      background:#111; border:1px solid #1a1a1a; border-radius:16px; overflow:hidden;
+      position:relative;
+    }
+    .room-canvas-badge {
+      position:absolute; top:12px; left:12px; z-index:10;
+      background:rgba(0,0,0,.7); backdrop-filter:blur(8px);
+      padding:.35rem .85rem; border-radius:20px; font-size:.72rem; font-weight:700;
+      color:#3b82f6; letter-spacing:.05em; text-transform:uppercase;
+    }
+    .room-controls-hint {
+      position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
+      padding:.3rem .75rem; border-radius:20px; font-size:.7rem; color:#888;
+      white-space:nowrap;
+    }
+    #room-canvas { display:block; width:100%; height:400px; }
+
+    /* Room info panel */
+    .room-info { display:flex; flex-direction:column; gap:1rem; }
+    .room-info-card { background:#111; border:1px solid #1a1a1a; border-radius:12px; padding:1.25rem; }
+    .room-info-card h3 { font-size:1.1rem; font-weight:800; margin-bottom:.25rem; }
+    .room-info-card p { font-size:.85rem; color:#666; margin-bottom:1rem; line-height:1.6; }
+    .room-tags { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .room-tag { padding:.3rem .7rem; border-radius:6px; font-size:.72rem; font-weight:600; background:#1a1a1a; color:#888; }
+    .room-tag.blue  { background:rgba(59,130,246,.12);  color:#3b82f6;  }
+    .room-tag.green { background:rgba(16,185,129,.12); color:#10b981; }
+    .room-tag.amber { background:rgba(245,158,11,.12);  color:#f59e0b;  }
+
+    .reno-list { display:flex; flex-direction:column; gap:.5rem; }
+    .reno-item { display:flex; align-items:center; gap:.75rem; font-size:.85rem; color:#ccc; }
+    .reno-item::before { content:'→'; color:#3b82f6; font-weight:700; flex-shrink:0; }
+
+    .upgrade-card {
+      background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.1));
+      border:1px solid rgba(59,130,246,.2); border-radius:12px; padding:1.25rem;
+      text-align:center;
+    }
+    .upgrade-card p { font-size:.85rem; color:#888; margin-bottom:.75rem; }
+    .upgrade-card-btn {
+      display:inline-block; padding:.65rem 1.5rem; border-radius:8px; border:none;
+      background:linear-gradient(135deg,#3b82f6,#8b5cf6); color:#fff;
+      font-size:.88rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .2s;
+    }
+    .upgrade-card-btn:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(59,130,246,.3); }
+
+    /* ---- Divider ---- */
+    .section-divider { height:1px; background:#1a1a1a; margin:2rem 0; }
+  </style>
+</head>
+<body>
+
+  <!-- AIUNITES Webring -->
+  <style>.aiunites-bar{position:fixed;top:0;left:0;right:0;z-index:10000;background:linear-gradient(90deg,#0a0a0f,#1a1a2e);border-bottom:1px solid rgba(99,102,241,.3);padding:8px 0;font-size:12px}.aiunites-bar-content{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;overflow-x:auto;scrollbar-width:none}.aiunites-bar-content::-webkit-scrollbar{display:none}.aiunites-bar a{color:rgba(255,255,255,.7);text-decoration:none;white-space:nowrap;transition:color .2s}.aiunites-bar a:hover{color:#fff}.aiunites-bar-brand{color:#6366f1!important;font-weight:600}.aiunites-bar .current{color:#fff!important;font-weight:600;text-decoration:underline;text-underline-offset:3px;}body{padding-top:36px!important}.rv-nav{top:36px!important}</style>
+  <div class="aiunites-bar"><div class="aiunites-bar-content"><a href="https://aiunites.github.io/aiunites-site/" class="aiunites-bar-brand">&#9670; AIUNITES</a><span style="color:rgba(255,255,255,.2)">|</span><a href="https://aiunites.github.io/aizines-app/">AIZines</a><a href="https://aiunites.github.io/aibyjob-demo/">AIByJob</a><a href="https://aiunites.github.io/redomy-demo/" class="current">Redomy</a><a href="https://aiunites.github.io/videobate-site/">VideoBate</a><a href="https://aiunites.github.io/voicestry-site/">VoiceStry</a><a href="https://aiunites.github.io/furnishthings-site/">FurnishThings</a><a href="https://aiunites.github.io/inthisworld-site/">InThisWorld</a><a href="https://aiunites.github.io/erpise-site/">ERPise</a><a href="https://aiunites.github.io/aitsql-site/">AITSQL</a><a href="https://aiunites.github.io/cosmostheopera-site/">&#127756; COSMOS</a></div></div>
+
+  <nav class="rv-nav">
+    <a href="index.html" class="logo">Redo<span style="color:#3b82f6">my</span></a>
+    <div class="rv-nav-links">
+      <a href="index.html" class="rv-nav-back">&#8592; Back to Redomy</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="rv-hero">
+    <div class="rv-badge">&#129302; AI-Powered</div>
+    <h1>See Your Room<br><span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">In 3D Before You Renovate</span></h1>
+    <p>Upload a photo of your room and AI instantly reads it — detecting layout, style, and renovation opportunities. Then explore interactive 3D room concepts for inspiration.</p>
+  </section>
+
+  <!-- Upload + AI Analysis -->
+  <div class="upload-section">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('photo-input').click()">
+      <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)">
+      <div class="upload-placeholder">
+        <div class="upload-icon">&#128247;</div>
+        <h3>Upload a Photo of Your Room</h3>
+        <p>JPG, PNG or WEBP &mdash; drag & drop or click to browse</p>
+        <p style="margin-top:.5rem;font-size:.78rem;color:#444;">AI will detect room type, style, dimensions estimate, and renovation ideas</p>
+      </div>
+      <img class="upload-preview" id="upload-preview" alt="Your room">
+    </div>
+  </div>
+
+  <div class="ai-panel">
+    <div class="ai-error" id="ai-error"></div>
+    <button class="ai-btn" id="ai-btn" onclick="analyzeRoom()" disabled>
+      &#129302; Analyze Room with AI
+    </button>
+    <div class="ai-loading" id="ai-loading">
+      <div class="ai-spinner"></div>
+      <p>AI is analyzing your room&hellip;</p>
+    </div>
+    <div class="ai-result" id="ai-result">
+      <div class="ai-result-header">AI Room Analysis</div>
+      <div class="ai-grid" id="ai-grid"></div>
+      <div class="ai-suggestions">
+        <h4>&#127981; Top Renovation Recommendations</h4>
+        <div id="ai-suggestions-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider" style="max-width:900px;margin:0 auto 2rem;"></div>
+
+  <!-- 3D Room Gallery -->
+  <div class="rooms-section">
+    <div class="rooms-title">Interactive 3D Concepts</div>
+    <h2 class="rooms-heading">Explore Room Ideas</h2>
+    <p class="rooms-sub">Rotate, inspect, and get inspired by these room concepts — styled like the virtual worlds in InThisWorld. Click any room to explore it in 3D.</p>
+
+    <div class="room-tabs" id="room-tabs">
+      <button class="room-tab active" onclick="loadRoom('kitchen')" data-room="kitchen">&#127859; Kitchen</button>
+      <button class="room-tab" onclick="loadRoom('bedroom')" data-room="bedroom">&#128716; Bedroom</button>
+      <button class="room-tab" onclick="loadRoom('living')" data-room="living">&#127968; Living Room</button>
+      <button class="room-tab" onclick="loadRoom('den')" data-room="den">&#128187; Den / Office</button>
+      <button class="room-tab" onclick="loadRoom('garage')" data-room="garage">&#128663; Garage</button>
+    </div>
+
+    <div class="room-viewer-wrap">
+      <div class="room-canvas-card">
+        <div class="room-canvas-badge" id="room-canvas-badge">&#127859; Kitchen</div>
+        <canvas id="room-canvas"></canvas>
+        <div class="room-controls-hint">&#128073; Drag to rotate &nbsp;&#128075; Scroll to zoom</div>
+      </div>
+
+      <div class="room-info" id="room-info">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <footer style="padding:2.5rem 5%;border-top:1px solid #1a1a1a;text-align:center;color:#555;font-size:.85rem;">
+    <div class="logo" style="margin-bottom:.5rem;">Redo<span style="color:#3b82f6">my</span></div>
+    <p>&copy; 2026 Redomy &mdash; A product of <a href="https://aiunites.github.io/aiunites-site" style="color:#3b82f6;">AIUNITES</a></p>
+    <div style="margin-top:.75rem;display:flex;gap:1.5rem;justify-content:center;">
+      <a href="index.html" style="color:#555;">Back to Redomy</a>
+      <a href="https://aiunites.github.io/inthisworld-site/" style="color:#555;">InThisWorld</a>
+      <a href="https://aiunites.github.io/aiunites-site/legal.html#privacy" style="color:#555;">Privacy</a>
+    </div>
+  </footer>
+
+  <script>
+  // ============================================================
+  // PHOTO UPLOAD
+  // ============================================================
+  var uploadedImageB64 = null;
+
+  function handlePhoto(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var src = ev.target.result;
+      document.getElementById('upload-preview').src = src;
+      document.getElementById('upload-zone').classList.add('has-image');
+      // strip data:image/...;base64, prefix
+      uploadedImageB64 = src.split(',')[1];
+      document.getElementById('ai-btn').disabled = false;
+      g('ai-result').classList.remove('show');
+      g('ai-error').classList.remove('show');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Drag and drop
+  var zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', function(){ zone.classList.remove('drag-over'); });
+  zone.addEventListener('drop', function(e){
+    e.preventDefault(); zone.classList.remove('drag-over');
+    var file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')){ handlePhoto({target:{files:[file]}}); }
+  });
+
+  function g(i){ return document.getElementById(i); }
+
+  // ============================================================
+  // AI ANALYSIS via Claude
+  // ============================================================
+  async function analyzeRoom(){
+    if(!uploadedImageB64){ alert('Please upload a photo first.'); return; }
+    g('ai-btn').disabled = true;
+    g('ai-loading').classList.add('show');
+    g('ai-result').classList.remove('show');
+    g('ai-error').classList.remove('show');
+
+    var prompt = `You are an expert interior designer and home renovation advisor. Analyze this room photo and respond ONLY with valid JSON (no markdown, no backticks):
+
+{
+  "room_type": "Kitchen|Bedroom|Living Room|Den/Office|Bathroom|Garage|Other",
+  "style": "Modern|Traditional|Farmhouse|Industrial|Scandinavian|Bohemian|Mid-Century|Other",
+  "condition": "Excellent|Good|Fair|Needs Work",
+  "size_estimate": "Small (~150 sqft)|Medium (~250 sqft)|Large (~400 sqft)|Open Plan",
+  "dominant_colors": ["color1","color2","color3"],
+  "key_features": ["feature1","feature2","feature3"],
+  "renovation_priority": "Low|Medium|High",
+  "recommendations": [
+    {"title":"Recommendation title","detail":"Specific actionable advice in 1 sentence."},
+    {"title":"Recommendation title","detail":"Specific actionable advice in 1 sentence."},
+    {"title":"Recommendation title","detail":"Specific actionable advice in 1 sentence."},
+    {"title":"Recommendation title","detail":"Specific actionable advice in 1 sentence."},
+    {"title":"Recommendation title","detail":"Specific actionable advice in 1 sentence."}
+  ]
+}`;
+
+    try {
+      var resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:1000,
+          messages:[{
+            role:'user',
+            content:[
+              {type:'image',source:{type:'base64',media_type:'image/jpeg',data:uploadedImageB64}},
+              {type:'text',text:prompt}
+            ]
+          }]
+        })
+      });
+      var data = await resp.json();
+      if(data.error){ throw new Error(data.error.message); }
+      var text = data.content[0].text.trim().replace(/^```json|```$/g,'').trim();
+      var parsed = JSON.parse(text);
+      showResult(parsed);
+    } catch(err){
+      g('ai-error').textContent = 'Analysis failed: ' + err.message + '. Please try again.';
+      g('ai-error').classList.add('show');
+    } finally {
+      g('ai-loading').classList.remove('show');
+      g('ai-btn').disabled = false;
+    }
+  }
+
+  function showResult(d){
+    // Cards
+    var cards = [
+      {label:'Room Type',    val:d.room_type},
+      {label:'Style',        val:d.style},
+      {label:'Condition',    val:d.condition},
+      {label:'Size Estimate',val:d.size_estimate},
+      {label:'Reno Priority',val:d.renovation_priority},
+      {label:'Colors',       val:(d.dominant_colors||[]).join(', ')},
+    ];
+    var gridHtml = cards.map(function(c){
+      return '<div class="ai-card"><div class="ai-card-label">'+c.label+'</div><div class="ai-card-val">'+(c.val||'—')+'</div></div>';
+    }).join('');
+    g('ai-grid').innerHTML = gridHtml;
+
+    // Suggestions
+    var recs = d.recommendations || [];
+    var recsHtml = recs.map(function(r,i){
+      return '<div class="ai-sug-item"><span class="ai-sug-num">'+(i+1)+'.</span><div><strong>'+r.title+'</strong> — '+r.detail+'</div></div>';
+    }).join('');
+    g('ai-suggestions-list').innerHTML = recsHtml || '<p style="color:#555">No recommendations found.</p>';
+
+    g('ai-result').classList.add('show');
+
+    // Auto-switch 3D room to detected type
+    var typeMap = {'Kitchen':'kitchen','Bedroom':'bedroom','Living Room':'living','Den/Office':'den','Garage':'garage'};
+    var detected = typeMap[d.room_type];
+    if(detected){ loadRoom(detected); }
+  }
+
+  // ============================================================
+  // THREE.JS 3D ROOM VIEWER
+  // ============================================================
+  var scene, camera, renderer, animId;
+  var isDragging=false, prevMX=0, prevMY=0;
+  var rotY=0.3, rotX=0.2, zoom=7;
+
+  var ROOM_DATA = {
+    kitchen: {
+      label:'&#127859; Kitchen',
+      name:'Modern Kitchen',
+      desc:'Open-concept kitchen with island, stainless appliances, and overhead cabinets. Perfect for entertaining.',
+      tags:[{t:'Open Plan',c:'blue'},{t:'Island Layout',c:'blue'},{t:'High Traffic',c:'amber'}],
+      reno:['Replace countertops with quartz or granite','Install under-cabinet LED lighting','Upgrade cabinet hardware','Add a tile or shiplap backsplash','Replace faucet and sink'],
+      buildFn: buildKitchen
+    },
+    bedroom: {
+      label:'&#128716; Bedroom',
+      name:'Master Bedroom',
+      desc:'Relaxing master bedroom with feature wall, large windows, and walk-in closet access.',
+      tags:[{t:'Master Suite',c:'blue'},{t:'Natural Light',c:'green'},{t:'Cozy',c:'amber'}],
+      reno:['Add an accent wall with wallpaper or paint','Upgrade to blackout curtains','Install recessed lighting','Add built-in closet organizers','Replace ceiling fan with statement fixture'],
+      buildFn: buildBedroom
+    },
+    living: {
+      label:'&#127968; Living Room',
+      name:'Living Room',
+      desc:'Spacious living room designed for relaxation and entertaining, with a focal fireplace and large sofa.',
+      tags:[{t:'Entertainment',c:'blue'},{t:'Fireplace',c:'amber'},{t:'Open Feel',c:'green'}],
+      reno:['Mount TV above fireplace','Install floating shelves','Add a statement area rug','Repoint or paint the fireplace surround','Add crown molding'],
+      buildFn: buildLiving
+    },
+    den: {
+      label:'&#128187; Den / Office',
+      name:'Home Den / Office',
+      desc:'Productive home office with built-in bookshelves, a large desk station, and warm ambient lighting.',
+      tags:[{t:'Work From Home',c:'blue'},{t:'Storage',c:'green'},{t:'Focus Space',c:'amber'}],
+      reno:['Install a built-in bookshelf wall','Add acoustic panels for sound control','Upgrade to a standing desk','Add proper task lighting','Run cable management solutions'],
+      buildFn: buildDen
+    },
+    garage: {
+      label:'&#128663; Garage',
+      name:'Garage / Workshop',
+      desc:'Multi-use garage with workbench, wall-mounted tool storage, and space for vehicles or a gym.',
+      tags:[{t:'Workshop',c:'blue'},{t:'Storage Wall',c:'green'},{t:'Epoxy Floor',c:'amber'}],
+      reno:['Epoxy coat the concrete floor','Install a pegboard tool wall','Add overhead storage shelving','Insulate garage door for climate control','Add a utility sink'],
+      buildFn: buildGarage
+    }
+  };
+
+  function initThree(){
+    var canvas = document.getElementById('room-canvas');
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111111);
+    scene.fog = new THREE.Fog(0x111111, 18, 30);
+
+    camera = new THREE.PerspectiveCamera(50, canvas.clientWidth/canvas.clientHeight, 0.1, 100);
+    camera.position.set(0, 3, zoom);
+
+    renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    resize3D();
+    window.addEventListener('resize', resize3D);
+
+    // Lighting
+    var ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambient);
+    var sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(5,10,5); sun.castShadow=true;
+    sun.shadow.mapSize.set(1024,1024);
+    scene.add(sun);
+    var fill = new THREE.DirectionalLight(0x4466ff, 0.3);
+    fill.position.set(-5,3,-5);
+    scene.add(fill);
+
+    // Mouse orbit
+    canvas.addEventListener('mousedown', function(e){ isDragging=true; prevMX=e.clientX; prevMY=e.clientY; });
+    window.addEventListener('mouseup', function(){ isDragging=false; });
+    canvas.addEventListener('mousemove', function(e){
+      if(!isDragging) return;
+      rotY += (e.clientX-prevMX)*0.008;
+      rotX += (e.clientY-prevMY)*0.005;
+      rotX = Math.max(-0.5,Math.min(0.8,rotX));
+      prevMX=e.clientX; prevMY=e.clientY;
+    });
+    canvas.addEventListener('wheel', function(e){
+      zoom += e.deltaY*0.01; zoom=Math.max(4,Math.min(14,zoom));
+    }, {passive:true});
+
+    // Touch orbit
+    var pinchDist=null, touchStartX=0, touchStartY=0;
+    canvas.addEventListener('touchstart', function(e){
+      if(e.touches.length===1){ isDragging=true; touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY; }
+      if(e.touches.length===2){ pinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); }
+    },{passive:true});
+    canvas.addEventListener('touchend', function(){ isDragging=false; pinchDist=null; },{passive:true});
+    canvas.addEventListener('touchmove', function(e){
+      if(e.touches.length===1&&isDragging){
+        rotY+=(e.touches[0].clientX-touchStartX)*0.008;
+        rotX+=(e.touches[0].clientY-touchStartY)*0.005;
+        rotX=Math.max(-0.5,Math.min(0.8,rotX));
+        touchStartX=e.touches[0].clientX; touchStartY=e.touches[0].clientY;
+      }
+      if(e.touches.length===2&&pinchDist!==null){
+        var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+        zoom-=(d-pinchDist)*0.02; zoom=Math.max(4,Math.min(14,zoom)); pinchDist=d;
+      }
+    },{passive:true});
+
+    animate();
+  }
+
+  function resize3D(){
+    var canvas=document.getElementById('room-canvas');
+    var w=canvas.parentElement.clientWidth, h=400;
+    canvas.style.width=w+'px'; canvas.style.height=h+'px';
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+
+  function animate(){
+    animId=requestAnimationFrame(animate);
+    camera.position.x=Math.sin(rotY)*zoom*Math.cos(rotX);
+    camera.position.y=Math.sin(rotX)*zoom+2;
+    camera.position.z=Math.cos(rotY)*zoom*Math.cos(rotX);
+    camera.lookAt(0,1.5,0);
+    renderer.render(scene,camera);
+  }
+
+  // ---- Helpers ----
+  function box(w,h,d,color,x,y,z,rx,ry,rz){
+    var geo=new THREE.BoxGeometry(w,h,d);
+    var mat=new THREE.MeshLambertMaterial({color:color});
+    var m=new THREE.Mesh(geo,mat);
+    m.position.set(x||0,y||0,z||0);
+    if(rx) m.rotation.x=rx; if(ry) m.rotation.y=ry; if(rz) m.rotation.z=rz;
+    m.castShadow=true; m.receiveShadow=true;
+    scene.add(m); return m;
+  }
+  function floor(w,d,color){ return box(w,.05,d,color,0,0,0); }
+  function wall(w,h,color,x,y,z,ry){
+    var b=box(w,h,.12,color,x,y,z,0,ry||0,0);
+    b.receiveShadow=true; return b;
+  }
+  function pointLight(color,intensity,x,y,z){
+    var l=new THREE.PointLight(color,intensity,8);
+    l.position.set(x,y,z); scene.add(l); return l;
+  }
+  function clearScene(){
+    while(scene.children.length>3){ scene.remove(scene.children[3]); }
+    rotY=0.4; rotX=0.25; zoom=7;
+  }
+
+  // ---- KITCHEN ----
+  function buildKitchen(){
+    floor(10,10,0x2a2a2a);
+    wall(10,5,0x3a3a3a,0,2.5,-5); // back
+    wall(5,5,0x3a3a3a,-5,2.5,0,Math.PI/2); // left
+    // Counters
+    box(4,.9,.9,0x8b9dc3,-3,.45,-4); // left counter
+    box(4,.9,.9,0x8b9dc3,0,.45,-4.5); // back counter
+    // Overhead cabinets
+    box(4,.8,.5,0x5a6a8a,-3,3.6,-4.3);
+    box(4,.8,.5,0x5a6a8a,0,3.6,-4.7);
+    // Island
+    box(2.5,.95,1.2,0x6a7a9a,0,.47,0);
+    // Stools
+    box(.4,.9,.4,0x4a3a2a,-0.7,.45,0.9);
+    box(.4,.9,.4,0x4a3a2a,0.7,.45,0.9);
+    // Fridge
+    box(.8,2,.7,0x777777,2.8,1,-4.4);
+    // Stove
+    box(1,.9,.8,0x555555,-1,.45,-4.5);
+    // Pendant lights
+    pointLight(0xffe4a0,1.2, 0,2.8,0);
+    pointLight(0xffe4a0,0.8,-3,2.5,-3);
+    // Window
+    box(1.8,1.4,.05,0x88bbdd,-4.5,2.5,-1.5,0,Math.PI/2);
+  }
+
+  // ---- BEDROOM ----
+  function buildBedroom(){
+    floor(10,10,0x1e1a18);
+    wall(10,5,0x3d3530,0,2.5,-5); // back
+    wall(5,5,0x3d3530,-5,2.5,0,Math.PI/2);
+    // Bed frame
+    box(3.6,.3,4.5,0x4a3525,0,.15,0.5);
+    // Mattress
+    box(3.4,.4,4.2,0xe8ddd0,0,.52,0.5);
+    // Pillows
+    box(1.3,.2,1,0xf5f0ea,-0.9,.74,-1.4);
+    box(1.3,.2,1,0xf5f0ea,0.9,.74,-1.4);
+    // Headboard
+    box(3.6,1.2,.15,0x5a4535,0,1,-1.8);
+    // Nightstands
+    box(.7,.6,.6,0x4a3525,-2.4,.3,-1.4);
+    box(.7,.6,.6,0x4a3525,2.4,.3,-1.4);
+    // Lamps
+    box(.1,.5,.1,0x888888,-2.4,.9,-1.4);
+    box(.1,.5,.1,0x888888,2.4,.9,-1.4);
+    // Dresser
+    box(2,.9,.5,0x5a4535,-4,.45,-3,0,Math.PI/2);
+    // Window with curtains
+    box(2,2,.05,0x88bbee,-4.5,2.5,0,0,Math.PI/2);
+    box(.25,2.5,.05,0x8b5e3c,-4.5,2.5,-1.2,0,Math.PI/2);
+    box(.25,2.5,.05,0x8b5e3c,-4.5,2.5,1.2,0,Math.PI/2);
+    // Warm lights
+    pointLight(0xffd080,1,0,3.5,0);
+    pointLight(0xffa060,0.8,-2.4,1.5,-1.4);
+    pointLight(0xffa060,0.8,2.4,1.5,-1.4);
+  }
+
+  // ---- LIVING ROOM ----
+  function buildLiving(){
+    floor(12,10,0x242220);
+    wall(12,5,0x383330,0,2.5,-5);
+    wall(6,5,0x383330,-6,2.5,0,Math.PI/2);
+    // Sofa
+    box(4,.5,1.6,0x5c6bc0,0,.25,1.5);
+    box(4,.8,.3,0x5c6bc0,0,.9,0.65);  // back
+    box(.3,.8,1.6,0x5c6bc0,-2.15,.9,1.5); // arm L
+    box(.3,.8,1.6,0x5c6bc0,2.15,.9,1.5);  // arm R
+    // Cushions
+    box(1.2,.25,1.2,0x4a5ab0,-1.2,.77,1.5);
+    box(1.2,.25,1.2,0x4a5ab0,0,.77,1.5);
+    box(1.2,.25,1.2,0x4a5ab0,1.2,.77,1.5);
+    // Coffee table
+    box(2.5,.1,1.2,0x6b4c35,0,.5,3.3);
+    box(.07,.5,.07,0x5a3d28,-1.1,.25,2.8); box(.07,.5,.07,0x5a3d28,1.1,.25,2.8);
+    box(.07,.5,.07,0x5a3d28,-1.1,.25,3.8); box(.07,.5,.07,0x5a3d28,1.1,.25,3.8);
+    // TV unit + TV
+    box(3.5,.6,1,0x2a2a2a,0,.3,-4.5);
+    box(2.8,1.6,.08,0x111111,0,1.4,-4.9);
+    // Fireplace
+    box(2.4,2,.3,0x555555,-4.5,1,-3,0,Math.PI/2);
+    box(2,.8,.28,0x222222,-4.5,0.4,-3,0,Math.PI/2);
+    pointLight(0xff6020,1.5,-4.5,0.6,-3);
+    // Plants
+    box(.4,.4,.4,0x2e5e2e,4,0.2,-4);
+    box(.06,1.2,.06,0x2e5e2e,4,1,-4);
+    // Rug
+    box(5,.02,3.5,0x8b4513,0,.03,2.5);
+    // Light
+    pointLight(0xfff0d0,1.5,0,4,-1);
+    pointLight(0xffe0a0,0.6,-4.5,2,-3);
+  }
+
+  // ---- DEN / OFFICE ----
+  function buildDen(){
+    floor(10,10,0x1a1e22);
+    wall(10,5,0x252b30,0,2.5,-5);
+    wall(5,5,0x252b30,-5,2.5,0,Math.PI/2);
+    // Desk
+    box(4,.07,1.8,0x4a5568,-1,0.75,0);
+    box(.05,.75,.05,0x3a4456,-2.9,0.37,-0.8); box(.05,.75,.05,0x3a4456,-2.9,0.37,0.8);
+    box(.05,.75,.05,0x3a4456,0.9,0.37,-0.8);  box(.05,.75,.05,0x3a4456,0.9,0.37,0.8);
+    // Monitor
+    box(1.4,.9,.06,0x111111,-1,1.3,-0.8);
+    box(.25,.25,.15,0x222222,-1,.78,-0.75);
+    // Keyboard
+    box(.9,.04,.35,0x333333,-1,.8,0.1);
+    // Chair
+    box(.7,.15,.7,0x2563eb,-.8,.4,1.3);
+    box(.6,.6,.1,0x2563eb,-.8,0.85,0.95);
+    box(.7,.02,.7,0x1d4ed8,-.8,.27,1.3);
+    // Bookshelf wall
+    box(.2,4,1.5,0x3a3020,-4.9,2,-3,0,Math.PI/2);
+    box(.2,4,1.5,0x3a3020,-4.9,2,-1,0,Math.PI/2);
+    box(.2,4,1.5,0x3a3020,-4.9,2,1,0,Math.PI/2);
+    // Shelves
+    var sy=[.6,1.4,2.2,3.0,3.8];
+    sy.forEach(function(y){ box(1.2,.05,1.5,0x4a3a25,-4.8,y,-3,0,Math.PI/2); });
+    // Books (colorful)
+    [[0x3b82f6,.3,0.6,-3],[0xef4444,.25,1.4,-2.5],[0x10b981,.3,2.2,-3.2],[0xf59e0b,.2,3.0,-2.8],[0x8b5cf6,.35,3.8,-3]].forEach(function(b){
+      box(.08,b[0]>0xffffff/2?.6:.5,.25,b[0],-4.8,b[2],b[3],0,Math.PI/2);
+    });
+    // Desk lamp
+    box(.05,.7,.05,0x888888,-2.5,0.75+.35,-.7);
+    pointLight(0xfff0c0,2,-2.5,1.8,-.5);
+    pointLight(0x4488ff,0.4,4,3,4);
+  }
+
+  // ---- GARAGE ----
+  function buildGarage(){
+    floor(14,12,0x363636);
+    wall(14,5,0x444444,0,2.5,-6);
+    wall(6,5,0x444444,-7,2.5,0,Math.PI/2);
+    wall(6,5,0x444444,7,2.5,0,Math.PI/2);
+    // Garage door (back)
+    box(10,4,.15,0x555555,0,2,-5.9);
+    // Car body
+    box(4,.7,2,0x2a5fa5,0,.5,1.5);
+    box(3,.55,1.8,0x3070c0,0,1.2,1.6);
+    // Wheels
+    [[1.8,.25,0.6,1],[1.8,.25,2.4,1],[-1.8,.25,0.6,1],[-1.8,.25,2.4,1]].forEach(function(w){ box(.25,.6,.6,0x111111,w[0],w[1],w[2]); });
+    // Workbench
+    box(4,.07,1.2,0x6b4c35,-5.9,0.9,-2.5,0,Math.PI/2);
+    // Pegboard
+    box(.06,3,3,0x5a4a35,-6.85,2,-2.5,0,Math.PI/2);
+    // Tools on pegboard
+    box(.06,.6,.1,0x888888,-6.8,2.5,-3,0,Math.PI/2);
+    box(.06,.4,.1,0x666666,-6.8,2,-1.8,0,Math.PI/2);
+    // Shelf unit
+    box(.15,3,2,0x4a3a25,6.85,1.5,-3,0,Math.PI/2);
+    [.5,1.3,2.1,2.9].forEach(function(y){ box(.15,.05,2,0x5a4a35,6.8,y,-3,0,Math.PI/2); });
+    // Boxes on shelves
+    box(.6,.5,.7,0xcc8800,6.8,.75,-3.3,0,Math.PI/2);
+    box(.5,.5,.6,0x3355aa,6.8,1.55,-2.5,0,Math.PI/2);
+    // Overhead light tubes
+    box(5,.08,.2,0xffffff,-3,4.8,0);
+    box(5,.08,.2,0xffffff,3,4.8,0);
+    pointLight(0xffffff,2,0,4,0);
+    pointLight(0xfff8e0,1,-4,4,-3);
+    pointLight(0xfff8e0,1,4,4,-3);
+  }
+
+  // ---- Load a room ----
+  function loadRoom(key){
+    if(!scene) return;
+    clearScene();
+    var d = ROOM_DATA[key];
+    if(!d) return;
+    d.buildFn();
+
+    // Update badge
+    g('room-canvas-badge').innerHTML = d.label;
+
+    // Update tabs
+    document.querySelectorAll('.room-tab').forEach(function(t){
+      t.classList.toggle('active', t.dataset.room===key);
+    });
+
+    // Update info panel
+    var reno = d.reno.map(function(r){
+      return '<div class="reno-item">'+r+'</div>';
+    }).join('');
+    var tags = d.tags.map(function(t){
+      return '<span class="room-tag '+t.c+'">'+t.t+'</span>';
+    }).join('');
+    g('room-info').innerHTML =
+      '<div class="room-info-card">'
+      +'<h3>'+d.name+'</h3>'
+      +'<p>'+d.desc+'</p>'
+      +'<div class="room-tags">'+tags+'</div>'
+      +'</div>'
+      +'<div class="room-info-card">'
+      +'<h4 style="font-size:.8rem;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">&#127981; Top Renovation Ideas</h4>'
+      +'<div class="reno-list">'+reno+'</div>'
+      +'</div>'
+      +'<div class="upgrade-card">'
+      +'<p>Upload your own room photo to get AI-powered renovation recommendations personalized to your space.</p>'
+      +'<button class="upgrade-card-btn" onclick="document.getElementById(\'upload-zone\').scrollIntoView({behavior:\'smooth\'})">&#129302; Analyze My Room</button>'
+      +'</div>';
+  }
+
+  // Init on load
+  window.addEventListener('load', function(){
+    initThree();
+    loadRoom('kitchen');
+  });
+  </script>
+
+</body>
+</html>
