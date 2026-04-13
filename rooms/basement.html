@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basement — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D unfinished basement and get renovation tips for waterproofing, framing, egress windows, and finishing.">
+  <link rel="canonical" href="https://redomy.com/rooms/basement.html">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}canvas{display:block;width:100vw;height:100vh}#overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}#overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}#overlay p{color:#888;font-size:.9rem;max-width:380px;margin-bottom:1.5rem;line-height:1.6}#overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}.ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}#hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}#hud-r{display:flex;gap:.6rem;pointer-events:all}.hb{padding:.3rem .85rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#888;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)}.hb:hover{border-color:#3b82f6;color:#3b82f6}#ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s}#ch.hot{color:#3b82f6}#tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(59,130,246,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}#tip.show{opacity:1}#tt{font-size:.8rem;font-weight:700;color:#3b82f6;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em}#tl{list-style:none;display:flex;flex-direction:column;gap:.4rem}#tl li{font-size:.77rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative}#tl li::before{content:'→';color:#3b82f6;position:absolute;left:0;font-weight:700}</style>
+</head>
+<body>
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#9935;</div>
+  <h2>Basement</h2>
+  <p>This unfinished basement has massive potential. Walk around and look at what to tackle first — from moisture to framing to egress windows.</p>
+  <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
+  <button class="ob" id="sb">Enter Basement &#8594;</button>
+</div>
+<div id="hud">
+  <div><div style="font-size:.78rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.05em">&#9935; Basement</div><div style="font-size:.68rem;color:#555">Look at areas for renovation tips</div></div>
+  <div id="hud-r"><button class="hb" onclick="location.href='index.html'">&#8592; All Rooms</button><button class="hb" onclick="location.href='../room-visualizer.html'">&#129302; AI</button></div>
+</div>
+<div id="ch">+</div>
+<div id="tip"><div id="tt"></div><ul id="tl"></ul></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const canvas=document.getElementById('c');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x080808); scene.fog=new THREE.Fog(0x080808,8,22);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.05,40); camera.position.set(0,1.7,4.5);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true;
+let yaw=0,pitch=0,locked=false; const keys={};
+canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
+document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
+document.addEventListener('keydown',e=>keys[e.code]=true); document.addEventListener('keyup',e=>keys[e.code]=false);
+const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
+const BOUNDS={x:[-5.2,5.2],z:[-5.2,5.2]}; const clock=new THREE.Clock();
+function move(dt){ fw.set(Math.sin(yaw),0,Math.cos(yaw)); rt.set(Math.cos(yaw),0,-Math.sin(yaw)); mv.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp']) mv.addScaledVector(fw,-1); if(keys['KeyS']||keys['ArrowDown']) mv.addScaledVector(fw,1);
+  if(keys['KeyA']||keys['ArrowLeft']) mv.addScaledVector(rt,1); if(keys['KeyD']||keys['ArrowRight']) mv.addScaledVector(rt,-1);
+  mv.normalize().multiplyScalar(4*dt);
+  camera.position.x=Math.max(BOUNDS.x[0],Math.min(BOUNDS.x[1],camera.position.x+mv.x));
+  camera.position.z=Math.max(BOUNDS.z[0],Math.min(BOUNDS.z[1],camera.position.z+mv.z));
+}
+const hotspots=[]; const ray=new THREE.Raycaster(),ld=new THREE.Vector3(); let active=null;
+function checkH(){ camera.getWorldDirection(ld); ray.set(camera.position,ld);
+  const hits=ray.intersectObjects(hotspots.map(h=>h.mesh),true);
+  const hit=hits.length?hotspots.find(h=>h.mesh===hits[0].object):null;
+  if(hit!==active){ active=hit;
+    if(hit){ document.getElementById('tt').textContent=hit.title; document.getElementById('tl').innerHTML=hit.tips.map(t=>'<li>'+t+'</li>').join(''); document.getElementById('tip').classList.add('show'); document.getElementById('ch').classList.add('hot'); }
+    else{ document.getElementById('tip').classList.remove('show'); document.getElementById('ch').classList.remove('hot'); }
+  }
+}
+function box(w,h,d,col,x,y,z,ry){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col})); m.position.set(x||0,y||0,z||0); if(ry)m.rotation.y=ry; m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+function tip(mesh,title,tips){ hotspots.push({mesh,title,tips}); return mesh; }
+function pl(col,int,x,y,z,d=9){ const l=new THREE.PointLight(col,int,d); l.position.set(x,y,z); scene.add(l); }
+
+// Bare bulb lighting — dingy basement feel
+scene.add(new THREE.AmbientLight(0x8888aa,.25));
+pl(0xffee88,0.8,0,3.5,0,12); pl(0xffee88,0.5,-4,3.5,-3,8);
+// Note: no fill lights — spooky basement!
+
+// Concrete floor with stain
+tip(box(11,.06,11,0x2a2a28,0,0,0),'Concrete Floor',[
+  'Test for moisture before ANY floor treatment: tape plastic overnight',
+  'Epoxy requires moisture meter reading below 75% RH',
+  'LVP (luxury vinyl plank) floats over concrete — no adhesive, no permit',
+  'Concrete stain is the cheapest finish that still looks intentional'
+]);
+
+// Concrete walls (raw)
+tip(box(11,4.2,.1,0x262626,0,2.1,-5.5),'Foundation Walls',[
+  'Crystalline waterproofing (Xypex, Drylok) stops active seepage',
+  'Interior French drain + sump pump is the permanent fix for water',
+  'DO NOT frame against walls until waterproofing is complete',
+  'Spray foam between rim joists is the best energy upgrade in any basement'
+]);
+box(11,4.2,.1,0x232323,0,2.1,5.5);
+box(.1,4.2,11,0x262626,-5.5,2.1,0); box(.1,4.2,11,0x232323,5.5,2.1,0);
+
+// Joists / floor above (open ceiling)
+const joist = box(11,.2,.1,0x3a3020,0,4.1,0);
+[-2.5,-1.5,-.5,.5,1.5,2.5].forEach(z=>box(11,.2,.1,0x3a3020,0,4.05,z));
+tip(joist,'Open Ceiling / Joists',[
+  'Painting joists and pipes black is trendy and saves $3k in drywall',
+  'Spray foam insulation between joists reduces noise from above',
+  'Plan plumbing/electrical routing before you close up the ceiling',
+  'Recessed lighting in drywall ceiling adds 12" of headroom vs. drop ceiling'
+]);
+
+// Water heater
+const wh = new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,1.6,12),new THREE.MeshLambertMaterial({color:0x5566aa}));
+wh.position.set(3.5,0.8,-4); wh.castShadow=true; scene.add(wh);
+tip(wh,'Water Heater',[
+  'Standard water heaters last 8–12 years; check the age label',
+  'Tankless (on-demand) saves 20–30% on water heating costs',
+  'Wrap the tank in an insulating blanket if older than 10 years',
+  'Drain 1–2 gallons annually to prevent sediment buildup'
+]);
+
+// HVAC unit
+tip(box(1.2,1.0,1.2,0x444855,-4,0.5,-4),'HVAC & Mechanicals',[
+  'Replace furnace filters every 3 months for efficiency and air quality',
+  'Seal HVAC ducts with mastic sealant — can reduce energy bill by 20%',
+  'Add a basement return air register to improve whole-house circulation',
+  'A whole-house dehumidifier ($300) prevents mold in finished basements'
+]);
+// Ducts
+box(5,.25,.25,0x555560,-1.5,3.7,-4.5); box(6,.25,.25,0x555560,0,3.7,0,Math.PI/2);
+
+// Framing starting point (suggestion)
+tip(box(3,.08,5,0x1e3a1e,-3,0.04,1),'Where to Start Framing',[
+  'Frame 2x4 walls 1" off the concrete — allows for insulation + airflow',
+  'Use pressure-treated lumber for the bottom plate (moisture contact)',
+  'Plan for a bathroom rough-in now even if not building it yet',
+  'Code requires egress window in any sleeping room below grade'
+]);
+// Framing studs (partial frame)
+[-2.5,-3.5,-4.5].forEach(z=>box(.08,2.8,.08,0x3a5a30,-1.5,1.4,z));
+
+// Egress window well (wall opening suggestion)
+tip(box(1.4,.06,1.4,0x223322,4.5,.03,-5.4),'Egress Window',[
+  'Required by code for any bedroom in the basement',
+  'Minimum: 5.7 sq ft clear opening, 24" high x 20" wide',
+  'Window well can double as a light source — add a clear cover',
+  'An egress window adds the most value per dollar in basement finishing'
+]);
+// Tiny window frame
+box(1.2,.8,.08,0x223322,4.5,3.2,-5.4);
+
+// Storage boxes (cluttered)
+[[2,0.4,-2],[2,0.4,-3],[1.5,0.4,-2.5],[2,1.3,-2]].forEach(p=>box(.7,.8,.7,0x8b6522,p[0],p[1],p[2]));
+tip(box(0.7,.8,.7,0x8b6522,1,0.4,-1.5),'Storage Organization',[
+  'Phase 1: clear out before you plan — you have 40% more space than you think',
+  'Metal shelving units rated 1,000 lbs are $80–120 at hardware stores',
+  'Store seasonal items in clear labeled totes on upper shelves',
+  'Define zones: utility, seasonal, sports, tools — even in an unfinished basement'
+]);
+
+// Bare bulb fixtures
+[0,-4].forEach(z=>{ const b=new THREE.Mesh(new THREE.SphereGeometry(.12,8,6),new THREE.MeshLambertMaterial({color:0xfff8cc,emissive:0xaa9940,emissiveIntensity:.5})); b.position.set(0,4.0,z); scene.add(b); });
+
+// Stairs outline
+tip(box(1.5,.08,3,0x2a2520,4,0.4,2.5),'Staircase',[
+  'Open risers look modern; closed risers add storage below',
+  'New treads and paint transforms stairs for $500–1,000',
+  'Add lighting in the stair risers for drama and safety',
+  'A finished staircase signals a polished basement to buyers'
+]);
+
+function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.05); move(dt); camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch; if(locked)checkH(); renderer.render(scene,camera); }
+animate();
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>

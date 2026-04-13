@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Room — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D living room and get renovation tips for sofa, fireplace, TV wall, lighting and more. Plan your living room remodel with Redomy.">
+  <link rel="canonical" href="https://redomy.com/rooms/living-room.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}
+    canvas{display:block;width:100vw;height:100vh}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}
+    #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}
+    #overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}
+    #overlay .ov-btn{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
+    #overlay .ov-btn:hover{transform:translateY(-2px)}
+    #overlay .ov-keys{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+    .ov-key{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace}
+    #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+    #hud-left{display:flex;flex-direction:column;gap:4px}
+    #hud-room{font-size:.8rem;font-weight:700;color:#3b82f6;letter-spacing:.05em;text-transform:uppercase}
+    #hud-sub{font-size:.7rem;color:#666}
+    #hud-right{display:flex;gap:.75rem;pointer-events:all}
+    .hud-btn{padding:.35rem .9rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#999;font-size:.72rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px);transition:all .15s}
+    .hud-btn:hover{border-color:#3b82f6;color:#3b82f6}
+    #crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s;line-height:1}
+    #crosshair.hot{color:#3b82f6}
+    #tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(59,130,246,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+    #tip.show{opacity:1}
+    #tip-title{font-size:.82rem;font-weight:700;color:#3b82f6;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em}
+    #tip-list{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+    #tip-list li{font-size:.78rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative}
+    #tip-list li::before{content:'→';color:#3b82f6;position:absolute;left:0;font-weight:700}
+    #look-hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;padding:.35rem .9rem;font-size:.72rem;color:#555;pointer-events:none;z-index:100;transition:opacity .4s}
+  </style>
+</head>
+<body>
+
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#127968;</div>
+  <h2>Living Room</h2>
+  <p>Walk around and look at objects to get renovation tips. Click anywhere to start exploring.</p>
+  <div class="ov-keys">
+    <span class="ov-key">W A S D</span>
+    <span class="ov-key">Mouse — Look</span>
+    <span class="ov-key">ESC — Release</span>
+  </div>
+  <button class="ov-btn" id="start-btn">Enter Room &#8594;</button>
+</div>
+
+<div id="hud">
+  <div id="hud-left">
+    <div id="hud-room">&#127968; Living Room</div>
+    <div id="hud-sub">Look at objects for renovation tips</div>
+  </div>
+  <div id="hud-right">
+    <button class="hud-btn" onclick="window.location.href='index.html'">&#8592; All Rooms</button>
+    <button class="hud-btn" onclick="window.location.href='../room-visualizer.html'">&#129302; AI Analysis</button>
+  </div>
+</div>
+
+<div id="crosshair">+</div>
+<div id="tip"><div id="tip-title"></div><ul id="tip-list"></ul></div>
+<div id="look-hint">Look at objects for renovation tips</div>
+<canvas id="c"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Engine ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111318);
+scene.fog = new THREE.Fog(0x111318, 10, 22);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth/innerHeight, 0.05, 40);
+camera.position.set(0, 1.7, 3.5);
+
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+
+// Pointer lock
+let yaw = 0, pitch = 0, locked = false;
+canvas.addEventListener('click', () => { if (!locked) canvas.requestPointerLock(); });
+document.getElementById('start-btn').addEventListener('click', () => canvas.requestPointerLock());
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === canvas;
+  document.getElementById('overlay').style.display = locked ? 'none' : 'flex';
+});
+document.addEventListener('mousemove', e => {
+  if (!locked) return;
+  yaw -= e.movementX * 0.0022;
+  pitch = Math.max(-1.1, Math.min(1.1, pitch - e.movementY * 0.0022));
+});
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Escape') { document.exitPointerLock(); }
+});
+document.addEventListener('keyup', e => keys[e.code] = false);
+
+// Movement
+const keys = {};
+const mv = new THREE.Vector3(), fw = new THREE.Vector3(), rt = new THREE.Vector3();
+const BOUNDS = {x:[-4.4,4.4], z:[-4.4,4.4]};
+const clock = new THREE.Clock();
+
+function move(dt) {
+  let any = false;
+  fw.set(Math.sin(yaw), 0, Math.cos(yaw));
+  rt.set(Math.cos(yaw), 0, -Math.sin(yaw));
+  mv.set(0,0,0);
+  if (keys['KeyW']||keys['ArrowUp'])    { mv.addScaledVector(fw,-1); any=true; }
+  if (keys['KeyS']||keys['ArrowDown'])  { mv.addScaledVector(fw, 1); any=true; }
+  if (keys['KeyA']||keys['ArrowLeft'])  { mv.addScaledVector(rt, 1); any=true; }
+  if (keys['KeyD']||keys['ArrowRight']) { mv.addScaledVector(rt,-1); any=true; }
+  if (!any) return;
+  mv.normalize().multiplyScalar(4 * dt);
+  camera.position.x = Math.max(BOUNDS.x[0], Math.min(BOUNDS.x[1], camera.position.x + mv.x));
+  camera.position.z = Math.max(BOUNDS.z[0], Math.min(BOUNDS.z[1], camera.position.z + mv.z));
+}
+
+// Hotspots
+const hotspots = [];
+const ray = new THREE.Raycaster();
+const ld = new THREE.Vector3();
+let active = null;
+let hintTimer = setTimeout(() => document.getElementById('look-hint').style.opacity='0', 4000);
+
+function checkHotspots() {
+  camera.getWorldDirection(ld);
+  ray.set(camera.position, ld);
+  const meshes = hotspots.map(h => h.mesh);
+  const hits = ray.intersectObjects(meshes, true);
+  const hit = hits.length ? hotspots.find(h => h.mesh === hits[0].object || h.mesh.children?.includes(hits[0].object)) : null;
+  if (hit !== active) {
+    active = hit;
+    if (hit) {
+      document.getElementById('tip-title').textContent = hit.title;
+      document.getElementById('tip-list').innerHTML = hit.tips.map(t => '<li>'+t+'</li>').join('');
+      document.getElementById('tip').classList.add('show');
+      document.getElementById('crosshair').classList.add('hot');
+    } else {
+      document.getElementById('tip').classList.remove('show');
+      document.getElementById('crosshair').classList.remove('hot');
+    }
+  }
+}
+
+// Helpers
+function box(w,h,d,col,x,y,z,ry) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:col}));
+  m.position.set(x||0,y||0,z||0);
+  if (ry) m.rotation.y = ry;
+  m.castShadow = m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function tip(mesh, title, tips) { hotspots.push({mesh, title, tips}); return mesh; }
+function pl(col, int, x,y,z,dist=7) {
+  const l = new THREE.PointLight(col, int, dist);
+  l.position.set(x,y,z); scene.add(l); return l;
+}
+
+// ── Lights ──────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const sun = new THREE.DirectionalLight(0xfffe8, 1.0);
+sun.position.set(4,10,5); sun.castShadow=true; scene.add(sun);
+pl(0xffe0a0, 1.2, 0, 3.5, 0, 9);
+pl(0xff7030, 0.8, -4.3, 0.8, -3, 5);
+pl(0x4466ff, 0.3, 4, 3, 3, 8);
+
+// ── Room ────────────────────────────────────────────────────────────────
+// Floor (hardwood)
+box(10, .06, 10, 0x3a2a1a, 0, 0, 0);
+// Ceiling
+box(10, .08, 10, 0x2a2a30, 0, 3.5, 0);
+// Walls
+box(10, 3.5, .1, 0x2e2e38, 0, 1.75, -5);    // back
+box(10, 3.5, .1, 0x282830, 0, 1.75, 5);     // front
+box(.1, 3.5, 10, 0x2e2e38, -5, 1.75, 0);    // left
+box(.1, 3.5, 10, 0x282830, 5, 1.75, 0);     // right
+
+// Sofa
+const sofaBase = box(4.2, .5, 1.6, 0x4a5068, 0, .25, 2.2);
+box(4.2, .75, .25, 0x4a5068, 0, .8, 1.35);   // back
+box(.3,  .75, 1.6, 0x3e4460, -2.1, .8, 2.2); // arm L
+box(.3,  .75, 1.6, 0x3e4460,  2.1, .8, 2.2); // arm R
+box(1.3, .25, 1.3, 0x585e7a, -1.1, .77, 2.2);
+box(1.3, .25, 1.3, 0x585e7a,  0,   .77, 2.2);
+box(1.3, .25, 1.3, 0x585e7a,  1.1, .77, 2.2);
+tip(sofaBase, 'Sofa & Seating', [
+  'Reupholster your existing sofa in performance fabric',
+  'Add a chaise lounge to create an L-shape sectional',
+  'Layer throws and pillows to change the look for under $100',
+  'Add a loveseat or accent chair to define the seating zone'
+]);
+
+// Coffee table
+const ct = box(2.4, .1, 1.2, 0x5a3c22, 0, .6, 3.8);
+box(.07,.6,.07,0x4a3218,-1.1,.3,3.3); box(.07,.6,.07,0x4a3218,1.1,.3,3.3);
+box(.07,.6,.07,0x4a3218,-1.1,.3,4.3); box(.07,.6,.07,0x4a3218,1.1,.3,4.3);
+tip(ct, 'Coffee Table', [
+  'Replace with an ottoman — adds dual function',
+  'Look for lift-top tables for hidden storage',
+  'Stack books + tray on top for instant styling',
+  'A round table improves traffic flow in smaller rooms'
+]);
+
+// TV wall + TV
+const tvUnit = box(3.8, .6, 1, 0x1e1e26, 0, .3, -4.6);
+const tv = box(3.0, 1.7, .08, 0x0a0a0c, 0, 1.5, -4.9);
+tip(tvUnit, 'Entertainment Wall', [
+  'Mount the TV to eliminate the media console clutter',
+  'Add floating shelves on both sides for balance',
+  'Run an in-wall cable kit — no exposed wires',
+  'Install LED bias lighting behind the TV for ambiance'
+]);
+
+// Fireplace
+const fp = box(2.6, 2.2, .35, 0x3a3540, -4.5, 1.1, -2.5, Math.PI/2);
+box(2.2, .9, .3, 0x1a1620, -4.5, .45, -2.5, Math.PI/2);   // firebox
+box(2.8, .15, .5, 0x4a4555, -4.5, 2.28, -2.5, Math.PI/2);  // mantel
+tip(fp, 'Fireplace', [
+  'Paint the surround in a bold color for drama',
+  'Reface with stone veneer — DIY-friendly and affordable',
+  'Convert gas insert to electric for a rental-safe upgrade',
+  'Rebuild the mantel with trim lumber and crown molding'
+]);
+pl(0xff5010, 1.5, -4.5, 0.6, -2.5, 4);
+
+// Window with curtains
+box(1.8, 1.8, .06, 0x88c0dd, -4.5, 2, 0.5, Math.PI/2);
+const curtain = box(.25, 2.4, .08, 0x6a4a8a, -4.5, 1.75, -0.45, Math.PI/2);
+box(.25, 2.4, .08, 0x6a4a8a, -4.5, 1.75, 1.45, Math.PI/2);
+tip(curtain, 'Windows & Curtains', [
+  'Install curtain rods at ceiling height — rooms look taller',
+  'Choose linen or velvet for a high-end feel',
+  'Go wide — curtain width should be 2x window width',
+  'Roman shades are a cleaner look for smaller windows'
+]);
+
+// Bookshelf
+const shelf = box(.25, 2.8, 1.8, 0x3a2a1a, 4.88, 1.4, -3, Math.PI/2);
+[.4,1.0,1.6,2.2].forEach(y => box(.25,.05,1.8,0x4a3520,4.82,y,-3,Math.PI/2));
+tip(shelf, 'Bookshelf / Built-Ins', [
+  'Paint the inside back of shelves in an accent color',
+  'IKEA Billy bookcases with custom doors = affordable built-ins',
+  'Style with 2/3 books and 1/3 decorative objects',
+  'Add LED strip lighting inside shelves for drama'
+]);
+
+// Accent chair
+const chair = box(.9,.5,.9,0x8b5e3c,-3,0.25,3.4);
+box(.85,.7,.1,0x7a5232,-3,.8,2.97);
+tip(chair, 'Accent Chair', [
+  'A bold patterned chair is the easiest room focal point',
+  'Place at an angle for a relaxed, layered look',
+  'Add a floor lamp beside it to create a reading nook',
+  'Reupholster vintage chairs for 1/3 the price of new'
+]);
+
+// Rug
+tip(box(5,.02,3.5,0x6b3a20,0,.04,3.0), 'Area Rug', [
+  'Rule of thumb: front legs of all furniture ON the rug',
+  '5x8 is the minimum; 8x10 is ideal for most living rooms',
+  'Layer a jute rug under a patterned one for texture depth',
+  'Choose a flat-weave rug in homes with pets — easy to clean'
+]);
+
+// Crown molding suggestion (top of back wall)
+tip(box(10,.1,.1,0x404048,0,3.42,-4.95), 'Crown Molding & Trim', [
+  'Crown molding can be DIY with a miter saw in a weekend',
+  'Paint trim in semi-gloss; walls in eggshell for contrast',
+  'Board & batten on lower half of wall = instant character',
+  'Built-up crown (3 pieces) looks more expensive than single'
+]);
+
+// Plants
+box(.4,.4,.4,0x1a3a1a, 3.5,.2,-4);
+box(.06,1.4,.06,0x1a3a1a, 3.5,.9,-4);
+box(.5,.4,.5,0x2e4a2e, 3.5,1.6,-4);
+
+// ── Animate ─────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  move(dt);
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+  if (locked) checkHotspots();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

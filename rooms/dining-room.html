@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dining Room — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D dining room and get renovation tips for the table, chandelier, buffet, and wainscoting.">
+  <link rel="canonical" href="https://redomy.com/rooms/dining-room.html">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}canvas{display:block;width:100vw;height:100vh}#overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}#overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}#overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}#overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}.ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}#hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}#hud-r{display:flex;gap:.6rem;pointer-events:all}.hb{padding:.3rem .85rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#888;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)}.hb:hover{border-color:#3b82f6;color:#3b82f6}#ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s}#ch.hot{color:#3b82f6}#tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(59,130,246,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}#tip.show{opacity:1}#tt{font-size:.8rem;font-weight:700;color:#3b82f6;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em}#tl{list-style:none;display:flex;flex-direction:column;gap:.4rem}#tl li{font-size:.77rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative}#tl li::before{content:'→';color:#3b82f6;position:absolute;left:0;font-weight:700}</style>
+</head>
+<body>
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#127860;</div>
+  <h2>Dining Room</h2>
+  <p>Walk around and look at the table, chandelier, buffet, and walls for renovation tips.</p>
+  <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
+  <button class="ob" id="sb">Enter Dining Room &#8594;</button>
+</div>
+<div id="hud">
+  <div><div style="font-size:.78rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.05em">&#127860; Dining Room</div><div style="font-size:.68rem;color:#555">Look at objects for tips</div></div>
+  <div id="hud-r"><button class="hb" onclick="location.href='index.html'">&#8592; All Rooms</button><button class="hb" onclick="location.href='../room-visualizer.html'">&#129302; AI</button></div>
+</div>
+<div id="ch">+</div>
+<div id="tip"><div id="tt"></div><ul id="tl"></ul></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const canvas=document.getElementById('c');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x100e0c); scene.fog=new THREE.Fog(0x100e0c,10,22);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.05,40); camera.position.set(0,1.7,3.5);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true;
+let yaw=0,pitch=0,locked=false; const keys={};
+canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
+document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
+document.addEventListener('keydown',e=>keys[e.code]=true); document.addEventListener('keyup',e=>keys[e.code]=false);
+const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
+const BOUNDS={x:[-4.4,4.4],z:[-4.4,4.4]}; const clock=new THREE.Clock();
+function move(dt){ fw.set(Math.sin(yaw),0,Math.cos(yaw)); rt.set(Math.cos(yaw),0,-Math.sin(yaw)); mv.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp']) mv.addScaledVector(fw,-1); if(keys['KeyS']||keys['ArrowDown']) mv.addScaledVector(fw,1);
+  if(keys['KeyA']||keys['ArrowLeft']) mv.addScaledVector(rt,1); if(keys['KeyD']||keys['ArrowRight']) mv.addScaledVector(rt,-1);
+  mv.normalize().multiplyScalar(4*dt);
+  camera.position.x=Math.max(BOUNDS.x[0],Math.min(BOUNDS.x[1],camera.position.x+mv.x));
+  camera.position.z=Math.max(BOUNDS.z[0],Math.min(BOUNDS.z[1],camera.position.z+mv.z));
+}
+const hotspots=[]; const ray=new THREE.Raycaster(),ld=new THREE.Vector3(); let active=null;
+function checkH(){ camera.getWorldDirection(ld); ray.set(camera.position,ld);
+  const hits=ray.intersectObjects(hotspots.map(h=>h.mesh),true);
+  const hit=hits.length?hotspots.find(h=>h.mesh===hits[0].object):null;
+  if(hit!==active){ active=hit;
+    if(hit){ document.getElementById('tt').textContent=hit.title; document.getElementById('tl').innerHTML=hit.tips.map(t=>'<li>'+t+'</li>').join(''); document.getElementById('tip').classList.add('show'); document.getElementById('ch').classList.add('hot'); }
+    else{ document.getElementById('tip').classList.remove('show'); document.getElementById('ch').classList.remove('hot'); }
+  }
+}
+function box(w,h,d,col,x,y,z,ry){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col})); m.position.set(x||0,y||0,z||0); if(ry)m.rotation.y=ry; m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+function tip(mesh,title,tips){ hotspots.push({mesh,title,tips}); return mesh; }
+function pl(col,int,x,y,z,d=7){ const l=new THREE.PointLight(col,int,d); l.position.set(x,y,z); scene.add(l); }
+
+// Lights
+scene.add(new THREE.AmbientLight(0xfff8ee,.4));
+const sun=new THREE.DirectionalLight(0xffffff,0.9); sun.position.set(4,10,3); sun.castShadow=true; scene.add(sun);
+pl(0xffcc70,2.0,0,2.4,0,8);  // chandelier
+pl(0xffe0a0,0.5,-4.5,2,0,6); pl(0xffe0a0,0.5,4.5,2,0,6);
+
+// Shell
+box(10,.06,10,0x2a1f14,0,0,0);   // hardwood floor
+box(10,.06,10,0x1e1c18,0,3.5,0);
+box(10,3.5,.1,0x2c2820,0,1.75,-5); box(10,3.5,.1,0x22201c,0,1.75,5);
+box(.1,3.5,10,0x2c2820,-5,1.75,0); box(.1,3.5,10,0x22201c,5,1.75,0);
+
+// Wainscoting panels (lower half of back wall)
+tip(box(9.8,1.4,.08,0x2a2218,0,.7,-4.95),'Wainscoting & Trim',[
+  'Board & batten wainscoting is a weekend DIY project',
+  'Go 36–42" high for formal dining rooms',
+  'Paint wainscoting in a contrasting color to the upper wall',
+  'Picture frame molding is an elegant alternative to board & batten'
+]);
+
+// Dining table (rectangle)
+const table = box(3.5,.09,1.8,0x5a3c22,0,.82,0);
+// Table legs
+[[-1.6,.41,-.8],[-1.6,.41,.8],[1.6,.41,-.8],[1.6,.41,.8]].forEach(p=>box(.07,.82,.07,0x4a3018,p[0],p[1],p[2]));
+tip(table,'Dining Table',[
+  'Rectangle tables seat more people efficiently; round promotes conversation',
+  'A marble or stone top elevates the room\'s design level instantly',
+  'Extendable tables are ideal for flexible entertaining',
+  'Leave 36" clearance around all sides for comfortable seating'
+]);
+
+// Dining chairs (6)
+const chairColor = 0x4a3535;
+[[-1.4,0,-1.2],[-1.4,0,0],[-1.4,0,1.2],[1.4,0,-1.2],[1.4,0,0],[1.4,0,1.2]].forEach(p=>{
+  const ch=box(.55,.46,.5,chairColor,p[0],.23,p[2]);
+  box(.5,.6,.08,chairColor,p[0],.76,p[2]-.22);
+  tip(ch,'Dining Chairs',[
+    'Upholstered seats are more comfortable; vinyl is easier to clean',
+    'Mixing chair styles (2 armed + 4 side) creates a collected look',
+    'A bench on one side adds flexibility and costs less than chairs',
+    'Reupholstering dining chairs: fabric + staple gun = weekend project'
+  ]);
+});
+
+// Chandelier
+const chand = box(.06,1.5,.06,0x888888,0,2.8,0); // chain
+const chandBase = box(1.2,.18,1.2,0x9a8060,0,2.0,0);
+tip(chandBase,'Chandelier',[
+  'Chandelier diameter (inches) = room width + length in feet',
+  'Hang 30–36" above the table surface',
+  'A statement chandelier is the fastest way to elevate a dining room',
+  'Rattan, iron, or brass all work; match to existing hardware'
+]);
+// Candle arms on chandelier
+[-0.5,0,0.5].forEach(x=>{ const g=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.2,8),new THREE.MeshLambertMaterial({color:0xfff0c0,emissive:0xcc9940,emissiveIntensity:.6})); g.position.set(x,1.9,0); scene.add(g); });
+
+// Buffet / sideboard
+const buffet = box(3.0,.95,.6,0x3a2818,-3.5,.47,-4.5,Math.PI/2);
+tip(buffet,'Buffet & Sideboard',[
+  'A sideboard anchors the room and adds critical storage',
+  'Style the top: tray + candles + greenery + art = instantly pulled together',
+  'Paint a thrift-store buffet in a bold color for maximum impact',
+  'Floating shelves above the buffet add display space'
+]);
+// Items on buffet
+box(.4,.5,.3,0x8855aa,-4.5,1.2,-4.5,Math.PI/2); // vase
+box(.15,.6,.15,0xccaa60,-4.0,1.2,-4.5,Math.PI/2); // candle
+
+// Art above buffet
+tip(box(1.8,1.2,.04,0x3a3050,-3.5,2.2,-4.9,Math.PI/2),'Wall Art & Gallery Wall',[
+  'One large piece (36"+) over the buffet reads as intentional and bold',
+  'Gallery walls: start with the largest piece centered, build out',
+  'Print and frame your own art from art sites for 90% less cost',
+  'Mirrors double natural light and make the room feel larger'
+]);
+
+// Plants in corners
+box(.4,.4,.4,0x1a3a1a,3.5,.2,-4); box(.06,1.6,.06,0x1a3a1a,3.5,1.0,-4); box(.55,.45,.55,0x2e4a2e,3.5,1.7,-4);
+
+// Rug
+tip(box(5,.02,3.5,0x4a3520,0,.04,0),'Area Rug',[
+  'All chair legs should remain ON the rug even when pulled out',
+  'Minimum: 6" beyond table on all sides = usually 8x10 or 9x12',
+  'Flat-weave rugs under tables: chairs move easily, clean simply',
+  'Dark rugs hide wine and food stains better in dining rooms'
+]);
+
+// Window with drapes
+box(1.5,1.6,.06,0x88b8d8,4.92,2.2,-1.5,Math.PI/2);
+const drape = box(.25,3.,.06,0x4a3838,4.92,1.75,-2.45,Math.PI/2);
+box(.25,3.,.06,0x4a3838,4.92,1.75,-.55,Math.PI/2);
+tip(drape,'Drapes & Lighting',[
+  'Floor-to-ceiling drapes make any room look taller',
+  'Layer sheer panels under lined drapes for day/night flexibility',
+  'Add a dimmer to overhead light and wall sconces for ambiance',
+  'Candles on the table improve dining atmosphere immediately'
+]);
+
+function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.05); move(dt); camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch; if(locked)checkH(); renderer.render(scene,camera); }
+animate();
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>

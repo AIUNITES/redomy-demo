@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bedroom — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D bedroom and get renovation tips for the bed, lighting, closet, and accent wall.">
+  <link rel="canonical" href="https://redomy.com/rooms/bedroom.html">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box} body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff} canvas{display:block;width:100vw;height:100vh}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}
+    #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem} #overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}
+    #overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
+    .ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}
+    #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+    #hud-r{display:flex;gap:.6rem;pointer-events:all} .hb{padding:.3rem .85rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#888;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)} .hb:hover{border-color:#3b82f6;color:#3b82f6}
+    #ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s} #ch.hot{color:#3b82f6}
+    #tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(59,130,246,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none} #tip.show{opacity:1}
+    #tt{font-size:.8rem;font-weight:700;color:#3b82f6;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em} #tl{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+    #tl li{font-size:.77rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative} #tl li::before{content:'→';color:#3b82f6;position:absolute;left:0;font-weight:700}
+  </style>
+</head>
+<body>
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#128716;</div>
+  <h2>Bedroom</h2>
+  <p>Walk around and look at the bed, walls, closet, and lighting for renovation tips.</p>
+  <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
+  <button class="ob" id="sb">Enter Bedroom &#8594;</button>
+</div>
+<div id="hud">
+  <div><div style="font-size:.78rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.05em">&#128716; Bedroom</div><div style="font-size:.68rem;color:#555">Look at objects for tips</div></div>
+  <div id="hud-r"><button class="hb" onclick="location.href='index.html'">&#8592; All Rooms</button><button class="hb" onclick="location.href='../room-visualizer.html'">&#129302; AI</button></div>
+</div>
+<div id="ch">+</div>
+<div id="tip"><div id="tt"></div><ul id="tl"></ul></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const canvas=document.getElementById('c');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0e0c12); scene.fog=new THREE.Fog(0x0e0c12,10,22);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.05,40); camera.position.set(0,1.7,3.5);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true;
+let yaw=0,pitch=0,locked=false; const keys={};
+canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
+document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
+document.addEventListener('keydown',e=>keys[e.code]=true); document.addEventListener('keyup',e=>keys[e.code]=false);
+const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
+const BOUNDS={x:[-4.4,4.4],z:[-4.4,4.4]}; const clock=new THREE.Clock();
+function move(dt){ fw.set(Math.sin(yaw),0,Math.cos(yaw)); rt.set(Math.cos(yaw),0,-Math.sin(yaw)); mv.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp']) mv.addScaledVector(fw,-1); if(keys['KeyS']||keys['ArrowDown']) mv.addScaledVector(fw,1);
+  if(keys['KeyA']||keys['ArrowLeft']) mv.addScaledVector(rt,1); if(keys['KeyD']||keys['ArrowRight']) mv.addScaledVector(rt,-1);
+  mv.normalize().multiplyScalar(4*dt);
+  camera.position.x=Math.max(BOUNDS.x[0],Math.min(BOUNDS.x[1],camera.position.x+mv.x));
+  camera.position.z=Math.max(BOUNDS.z[0],Math.min(BOUNDS.z[1],camera.position.z+mv.z));
+}
+const hotspots=[]; const ray=new THREE.Raycaster(),ld=new THREE.Vector3(); let active=null;
+function checkH(){ camera.getWorldDirection(ld); ray.set(camera.position,ld);
+  const hits=ray.intersectObjects(hotspots.map(h=>h.mesh),true);
+  const hit=hits.length?hotspots.find(h=>h.mesh===hits[0].object):null;
+  if(hit!==active){ active=hit;
+    if(hit){ document.getElementById('tt').textContent=hit.title; document.getElementById('tl').innerHTML=hit.tips.map(t=>'<li>'+t+'</li>').join(''); document.getElementById('tip').classList.add('show'); document.getElementById('ch').classList.add('hot'); }
+    else{ document.getElementById('tip').classList.remove('show'); document.getElementById('ch').classList.remove('hot'); }
+  }
+}
+function box(w,h,d,col,x,y,z,ry){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col})); m.position.set(x||0,y||0,z||0); if(ry)m.rotation.y=ry; m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+function tip(mesh,title,tips){ hotspots.push({mesh,title,tips}); return mesh; }
+function pl(col,int,x,y,z,d=7){ const l=new THREE.PointLight(col,int,d); l.position.set(x,y,z); scene.add(l); }
+
+// Lights — warm and moody
+scene.add(new THREE.AmbientLight(0xffeedd,.35));
+const sun=new THREE.DirectionalLight(0xfff4e0,.7); sun.position.set(3,8,5); sun.castShadow=true; scene.add(sun);
+pl(0xffd080,1.2,0,3.2,0,10); pl(0xffa060,1.0,-2.5,1.6,-1.2,5); pl(0xffa060,1.0,2.5,1.6,-1.2,5);
+pl(0x6633aa,.2,0,2,0,8); // ambient purple fill
+
+// Shell
+box(10,.06,10,0x1e1825,0,0,0);   // floor (carpet)
+box(10,.06,10,0x1c1a22,0,3.6,0); // ceiling
+box(10,3.6,.1,0x252030,0,1.8,-5);  // back wall (accent)
+box(10,3.6,.1,0x1e1c28,0,1.8,5);
+box(.1,3.6,10,0x1e1c28,-5,1.8,0); box(.1,3.6,10,0x1e1c28,5,1.8,0);
+
+// Accent wall (back, subtle pattern via color)
+tip(box(10,3.6,.08,0x2a2040,0,1.8,-4.98),'Accent Wall',[
+  'A moody dark paint color on just the headboard wall is powerful',
+  'Wallpaper on one wall is far more affordable than full room',
+  'Limewash paint creates organic texture that looks expensive',
+  'Shiplap or board & batten panels add architectural interest'
+]);
+
+// Bed frame
+const bedFrame = box(3.8,.28,4.6,0x3a2a40,0,.14,0);
+tip(bedFrame,'Bed Frame',[
+  'A statement upholstered headboard elevates any bedroom instantly',
+  'Platform beds with storage drawers gain you 6–10 cu ft of space',
+  'Paint a wood frame in matte black or navy for a modern look',
+  'A canopy frame adds drama without structural changes'
+]);
+// Mattress
+box(3.6,.36,4.3,0xe8ddd0,0,.5,0);
+// Headboard
+tip(box(3.8,1.4,.15,0x5a3a6a,0,1.38,-2.15),'Headboard & Pillows',[
+  'Tall upholstered headboards (60"+) add drama and sound absorption',
+  'DIY headboard: foam + plywood + fabric = <$80',
+  'Layer European shams behind standard pillows for a hotel look',
+  'Add lumbar pillows in a contrasting fabric for depth'
+]);
+// Pillows + duvet
+box(1.4,.22,1.1,0xf5f0ea,-1,.72,-1.6); box(1.4,.22,1.1,0xf5f0ea,1,.72,-1.6);
+box(3.5,.18,2.8,0xeae4f0,0,.55,1.0);
+
+// Nightstands
+const ns1 = box(.75,.6,.65,-2.5,.3,-1.3,0x3a2a40);
+const ns2 = box(.75,.6,.65,2.5,.3,-1.3,0x3a2a40);
+tip(ns1,'Nightstands',[
+  'Matching nightstands create symmetry; mismatched adds character',
+  'Look for nightstands with drawers AND an open shelf',
+  'A small tray on top corrals clutter and looks intentional',
+  'Wall-mounted floating nightstands free up floor space'
+]);
+// Lamps
+[[-2.5,1.05,-1.3],[2.5,1.05,-1.3]].forEach(p=>{ box(.1,.5,.1,0x888888,p[0],p[1],p[2]); const g=new THREE.Mesh(new THREE.SphereGeometry(.2,8,6),new THREE.MeshLambertMaterial({color:0xfff0dd,emissive:0x997740,emissiveIntensity:.5})); g.position.set(p[0],p[1]+.35,p[2]); scene.add(g); });
+
+// Dresser
+const dresser = box(2.1,.96,.6,0x2e2040,-3.9,.48,-3,Math.PI/2);
+tip(dresser,'Dresser & Storage',[
+  'Swap standard drawer pulls for brass or ceramic hardware',
+  'Add a mirror above for both function and visual depth',
+  'Paint the dresser in a bold color as a furniture statement',
+  'Consider a tall chest instead of wide dresser to free floor space'
+]);
+
+// Mirror above dresser
+box(1.2,1.6,.05,0x6688aa,-3.9,1.7,-3,Math.PI/2);
+
+// Closet suggestion (right wall panel)
+tip(box(.08,3.6,2.5,0x302840,4.92,1.8,-2,Math.PI/2),'Closet Organization',[
+  'IKEA PAX system is the highest ROI closet upgrade available',
+  'Double-hang short items (shirts, jackets) to double rod space',
+  'Pull-out shoe shelves are better than stacking on the floor',
+  'Add interior lighting — a motion sensor LED strip is under $15'
+]);
+
+// Window with curtains
+box(1.8,1.5,.06,0x88b0dd,-4.92,2.2,0.5,Math.PI/2);
+const curt = box(.28,2.8,.06,0x6a3a7a,-4.92,1.9,-0.55,Math.PI/2);
+box(.28,2.8,.06,0x6a3a7a,-4.92,1.9,1.55,Math.PI/2);
+tip(curt,'Curtains & Window Treatment',[
+  'Hang curtain rods at ceiling height — adds 6+ inches of visual height',
+  'Choose blackout lined curtains for master bedroom sleep quality',
+  'Width: curtains should be 2x the window width to look full',
+  'Velvet curtains add luxury texture without major cost'
+]);
+
+// Area rug
+tip(box(4.2,.02,5.5,0x3a2855,0,.04,0.5),'Area Rug',[
+  'Under-bed rug should extend 18–24" on all sides of the bed',
+  '5x8 minimum; 8x10 is ideal for a queen or king bed',
+  'Persian or global pattern adds warmth and complexity',
+  'Layer a sheepskin or hide over a flat-weave for texture'
+]);
+
+// Overhead flush light
+const light=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.06,12),new THREE.MeshLambertMaterial({color:0xfff8f0,emissive:0xccaa60,emissiveIntensity:.4})); light.position.set(0,3.55,0); scene.add(light);
+tip(light,'Ceiling Light & Fixtures',[
+  'Replace builder-grade flush mount with a statement pendant',
+  'A chandelier (even small) elevates the bedroom instantly',
+  'Install a dimmer switch — bedroom lighting should always be dimmable',
+  'Smart bulbs give you warm/cool control without new fixtures'
+]);
+
+function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.05); move(dt); camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch; if(locked)checkH(); renderer.render(scene,camera); }
+animate();
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>

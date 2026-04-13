@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchen — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D kitchen and get renovation tips for cabinets, countertops, island, appliances and more.">
+  <link rel="canonical" href="https://redomy.com/rooms/kitchen.html">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}
+    canvas{display:block;width:100vw;height:100vh}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}
+    #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}
+    #overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}
+    #overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
+    .ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}
+    #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+    #hud-r{display:flex;gap:.6rem;pointer-events:all}
+    .hb{padding:.3rem .85rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#888;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)}
+    .hb:hover{border-color:#3b82f6;color:#3b82f6}
+    #ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s}
+    #ch.hot{color:#3b82f6}
+    #tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.92);backdrop-filter:blur(14px);border:1px solid rgba(59,130,246,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+    #tip.show{opacity:1}
+    #tt{font-size:.8rem;font-weight:700;color:#3b82f6;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em}
+    #tl{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+    #tl li{font-size:.77rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative}
+    #tl li::before{content:'→';color:#3b82f6;position:absolute;left:0;font-weight:700}
+  </style>
+</head>
+<body>
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#127859;</div>
+  <h2>Kitchen</h2>
+  <p>Walk around and look at cabinets, countertops, the island and appliances for renovation tips.</p>
+  <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
+  <button class="ob" id="sb">Enter Kitchen &#8594;</button>
+</div>
+<div id="hud">
+  <div>
+    <div style="font-size:.78rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.05em">&#127859; Kitchen</div>
+    <div style="font-size:.68rem;color:#555">Look at objects for tips</div>
+  </div>
+  <div id="hud-r">
+    <button class="hb" onclick="location.href='index.html'">&#8592; All Rooms</button>
+    <button class="hb" onclick="location.href='../room-visualizer.html'">&#129302; AI</button>
+  </div>
+</div>
+<div id="ch">+</div>
+<div id="tip"><div id="tt"></div><ul id="tl"></ul></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const canvas=document.getElementById('c');
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x14120e); scene.fog=new THREE.Fog(0x14120e,10,22);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.05,40);
+camera.position.set(0,1.7,3.5);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true;
+let yaw=0,pitch=0,locked=false;
+const keys={};
+canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
+document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
+document.addEventListener('keydown',e=>{ keys[e.code]=true; });
+document.addEventListener('keyup',e=>keys[e.code]=false);
+const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
+const BOUNDS={x:[-4.4,4.4],z:[-4.4,4.4]};
+const clock=new THREE.Clock();
+function move(dt){ fw.set(Math.sin(yaw),0,Math.cos(yaw)); rt.set(Math.cos(yaw),0,-Math.sin(yaw)); mv.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp']) mv.addScaledVector(fw,-1); if(keys['KeyS']||keys['ArrowDown']) mv.addScaledVector(fw,1);
+  if(keys['KeyA']||keys['ArrowLeft']) mv.addScaledVector(rt,1); if(keys['KeyD']||keys['ArrowRight']) mv.addScaledVector(rt,-1);
+  mv.normalize().multiplyScalar(4*dt);
+  camera.position.x=Math.max(BOUNDS.x[0],Math.min(BOUNDS.x[1],camera.position.x+mv.x));
+  camera.position.z=Math.max(BOUNDS.z[0],Math.min(BOUNDS.z[1],camera.position.z+mv.z));
+}
+const hotspots=[];
+const ray=new THREE.Raycaster(),ld=new THREE.Vector3();
+let active=null;
+function checkH(){ camera.getWorldDirection(ld); ray.set(camera.position,ld);
+  const hits=ray.intersectObjects(hotspots.map(h=>h.mesh),true);
+  const hit=hits.length?hotspots.find(h=>h.mesh===hits[0].object):null;
+  if(hit!==active){ active=hit;
+    if(hit){ document.getElementById('tt').textContent=hit.title; document.getElementById('tl').innerHTML=hit.tips.map(t=>'<li>'+t+'</li>').join(''); document.getElementById('tip').classList.add('show'); document.getElementById('ch').classList.add('hot'); }
+    else { document.getElementById('tip').classList.remove('show'); document.getElementById('ch').classList.remove('hot'); }
+  }
+}
+function box(w,h,d,col,x,y,z,ry){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col})); m.position.set(x||0,y||0,z||0); if(ry)m.rotation.y=ry; m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+function tip(mesh,title,tips){ hotspots.push({mesh,title,tips}); return mesh; }
+function pl(col,int,x,y,z,d=7){ const l=new THREE.PointLight(col,int,d); l.position.set(x,y,z); scene.add(l); }
+
+// Lights
+scene.add(new THREE.AmbientLight(0xfff8f0,.55));
+const sun=new THREE.DirectionalLight(0xffffff,1.1); sun.position.set(2,10,4); sun.castShadow=true; scene.add(sun);
+pl(0xfff0d0,1.4,0,3.2,0,10); pl(0xffe8b0,0.8,-3,2.8,-4,7); pl(0xffffff,0.5,3,2.8,-4,7);
+
+// Room shell
+box(10,.06,10,0x2c2218,0,0,0);   // floor (tile)
+box(10,.06,10,0x2a2520,0,3.5,0); // ceiling
+box(10,3.5,.1,0x2e2a26,0,1.75,-5); box(10,3.5,.1,0x262420,0,1.75,5);
+box(.1,3.5,10,0x2e2a26,-5,1.75,0); box(.1,3.5,10,0x262420,5,1.75,0);
+
+// Counter run (U-shape)
+const lCounter = box(4,.95,.9,0x8899b3,-3,.47,-4);  // left
+const bCounter = box(5,.95,.9,0x8899b3,0,.47,-4.5,0); // back
+const rCounter = box(.9,.95,4,0x8899b3,4.5,.47,-2.5); // right
+tip(lCounter,'Countertops',[
+  'Quartz beats granite: more consistent, easier maintenance',
+  'Waterfall edge on the island makes it a true showpiece',
+  'Honed finish hides scratches better than polished',
+  'Budget pick: butcher block counters look expensive and are DIY-friendly'
+]);
+
+// Overhead cabinets
+const ucab = box(4,.85,.45,0x6a7a9a,-3,3.1,-4.3);
+box(5,.85,.45,0x6a7a9a,0,3.1,-4.7);
+tip(ucab,'Upper Cabinets',[
+  'Remove upper cabinet doors for open-shelf look — free',
+  'Go to ceiling height to add 30–40% more storage',
+  'Add interior LED strip lighting inside glass-front cabinets',
+  'Repainting cabinets is the single highest-ROI kitchen upgrade'
+]);
+
+// Lower base cabinets
+const lcab = box(4,.9,.9,0x5a6a8a,-3,.45,-3.55);
+tip(lcab,'Base Cabinets',[
+  'Soft-close hinges and drawer slides: $2 each, huge quality feel',
+  'Pull-out shelves inside base cabinets double usable space',
+  'Replace face frame hardware first — huge impact, low cost',
+  'Consider lazy susans or pull-outs for corner dead zones'
+]);
+
+// Island
+const island = box(2.6,.98,1.4,0x6a7a9a,0,.49,-0.5);
+tip(island,'Kitchen Island',[
+  'Add seating on one side — saves a separate dining table',
+  'Contrasting island color (navy, sage, black) is trending',
+  'Install pendant lights 30–36" above the counter surface',
+  'Hidden electrical in the island is worth the permit cost'
+]);
+// Stools
+[-0.9,0,0.9].forEach(x => { box(.38,.92,.38,0x3a2a1a,x,.46,0.38); });
+
+// Fridge
+const fridge = box(.9,2.1,.8,0x7a8090,3.9,1.05,-4.4);
+tip(fridge,'Refrigerator',[
+  'Counter-depth fridges flush to cabinetry — cleaner look',
+  'French-door is most ergonomic: access fresh food at eye level',
+  'Panel-ready fridges hide behind cabinet doors for seamless look',
+  'Leave 1" clearance on sides for proper airflow'
+]);
+
+// Range/stove
+const range = box(1.1,.95,.9,0x444444,-1,.47,-4.5);
+tip(range,'Range & Hood',[
+  'A statement range hood raises the kitchen\'s design level instantly',
+  'Gas vs. induction: induction is faster and safer; no gas line cost',
+  'Wall-mount hood over an island creates a luxury focal point',
+  'Pot filler above the range = convenience upgrade worth the plumbing cost'
+]);
+
+// Sink
+const sink = box(1.,.1,.7,0x6a7a80,2,.96,-4.55);
+tip(sink,'Sink & Faucet',[
+  'Apron-front (farmhouse) sinks are the most impactful swap',
+  'Under-mount sink makes counters easier to clean',
+  'A touch-activated faucet pays for itself in convenience',
+  'Add a garbage disposal if you don\'t have one — <$200'
+]);
+
+// Backsplash
+tip(box(4,.8,.05,0x9ab0c8,-3,1.6,-4.55),'Backsplash',[
+  'Subway tile is timeless and DIY-friendly for a weekend project',
+  'Extend backsplash to the ceiling behind the range for drama',
+  'Unlacquered brass tile on just the range wall — big impact, small area',
+  'Peel-and-stick tile is a renter-friendly option that looks great'
+]);
+
+// Pendant lights
+[(-1.3),(0),(1.3)].forEach(x => { const s=new THREE.Mesh(new THREE.SphereGeometry(.15,8,6),new THREE.MeshLambertMaterial({color:0xffd070,emissive:0x997040,emissiveIntensity:.5})); s.position.set(x,2.9,-0.5); scene.add(s); });
+const pendBase = box(.3,.05,1.5,0x888888,0,3.3,-0.5);
+tip(pendBase,'Pendant Lighting',[
+  'Hang pendants 30–36" above the island counter',
+  'Odd numbers (3) of pendants look better than pairs',
+  'Rattan or woven shades add warmth and texture',
+  'Mixed metals (brass + black) is a current trend that works'
+]);
+
+// Window above sink
+box(1.5,1.2,.06,0x88c0d8,2,2,-4.92);
+
+// Toaster / small appliances
+box(.4,.35,.3,0x888888,-2.2,.97,-3.6);
+box(.5,.35,.4,0x666666,-2.9,.97,-3.6);
+
+function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.05); move(dt); camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch; if(locked)checkH(); renderer.render(scene,camera); }
+animate();
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>

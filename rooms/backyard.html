@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backyard — Walk in 3D | Redomy</title>
+  <meta name="description" content="Walk through a 3D backyard and get renovation tips for the patio, deck, lawn, fence, and outdoor kitchen.">
+  <link rel="canonical" href="https://redomy.com/rooms/backyard.html">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}canvas{display:block;width:100vw;height:100vh}#overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem}#overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}#overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}#overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#22c55e,#15803d);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}.ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}#hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);pointer-events:none}#hud-r{display:flex;gap:.6rem;pointer-events:all}.hb{padding:.3rem .85rem;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.5);color:#aaa;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)}.hb:hover{border-color:#22c55e;color:#22c55e}#ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s}#ch.hot{color:#22c55e}#tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(5,12,8,.92);backdrop-filter:blur(14px);border:1px solid rgba(34,197,94,.35);border-radius:13px;padding:1.1rem 1.2rem;width:240px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}#tip.show{opacity:1}#tt{font-size:.8rem;font-weight:700;color:#22c55e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.04em}#tl{list-style:none;display:flex;flex-direction:column;gap:.4rem}#tl li{font-size:.77rem;color:#ccc;line-height:1.5;padding-left:.9rem;position:relative}#tl li::before{content:'→';color:#22c55e;position:absolute;left:0;font-weight:700}</style>
+</head>
+<body>
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#127807;</div>
+  <h2>Backyard</h2>
+  <p>Walk through your outdoor space and look at the deck, patio, lawn, fence, and outdoor features for renovation tips.</p>
+  <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
+  <button class="ob" id="sb">Go Outside &#8594;</button>
+</div>
+<div id="hud">
+  <div><div style="font-size:.78rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.05em">&#127807; Backyard</div><div style="font-size:.68rem;color:#666">Look at objects for tips</div></div>
+  <div id="hud-r"><button class="hb" onclick="location.href='index.html'">&#8592; All Rooms</button><button class="hb" onclick="location.href='../room-visualizer.html'">&#129302; AI</button></div>
+</div>
+<div id="ch">+</div>
+<div id="tip"><div id="tt"></div><ul id="tl"></ul></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const canvas=document.getElementById('c');
+const scene=new THREE.Scene();
+// Sky gradient via fog
+scene.background=new THREE.Color(0x5aa8e0);
+scene.fog=new THREE.Fog(0x7ec8f0,18,35);
+const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,0.05,60); camera.position.set(0,1.7,6);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true;
+let yaw=Math.PI,pitch=0,locked=false; const keys={};
+canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
+document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
+document.addEventListener('keydown',e=>keys[e.code]=true); document.addEventListener('keyup',e=>keys[e.code]=false);
+const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
+const BOUNDS={x:[-7,7],z:[-7,9]}; const clock=new THREE.Clock();
+function move(dt){ fw.set(Math.sin(yaw),0,Math.cos(yaw)); rt.set(Math.cos(yaw),0,-Math.sin(yaw)); mv.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp']) mv.addScaledVector(fw,-1); if(keys['KeyS']||keys['ArrowDown']) mv.addScaledVector(fw,1);
+  if(keys['KeyA']||keys['ArrowLeft']) mv.addScaledVector(rt,1); if(keys['KeyD']||keys['ArrowRight']) mv.addScaledVector(rt,-1);
+  mv.normalize().multiplyScalar(4*dt);
+  camera.position.x=Math.max(BOUNDS.x[0],Math.min(BOUNDS.x[1],camera.position.x+mv.x));
+  camera.position.z=Math.max(BOUNDS.z[0],Math.min(BOUNDS.z[1],camera.position.z+mv.z));
+}
+const hotspots=[]; const ray=new THREE.Raycaster(),ld=new THREE.Vector3(); let active=null;
+function checkH(){ camera.getWorldDirection(ld); ray.set(camera.position,ld);
+  const hits=ray.intersectObjects(hotspots.map(h=>h.mesh),true);
+  const hit=hits.length?hotspots.find(h=>h.mesh===hits[0].object):null;
+  if(hit!==active){ active=hit;
+    if(hit){ document.getElementById('tt').textContent=hit.title; document.getElementById('tl').innerHTML=hit.tips.map(t=>'<li>'+t+'</li>').join(''); document.getElementById('tip').classList.add('show'); document.getElementById('ch').classList.add('hot'); }
+    else{ document.getElementById('tip').classList.remove('show'); document.getElementById('ch').classList.remove('hot'); }
+  }
+}
+function box(w,h,d,col,x,y,z,ry){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:col})); m.position.set(x||0,y||0,z||0); if(ry)m.rotation.y=ry; m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+function tip(mesh,title,tips){ hotspots.push({mesh,title,tips}); return mesh; }
+function pl(col,int,x,y,z,d=10){ const l=new THREE.PointLight(col,int,d); l.position.set(x,y,z); scene.add(l); }
+function tree(x,z){ box(.3,2.5,.3,0x4a3520,x,.75,z); const f=new THREE.Mesh(new THREE.SphereGeometry(.9,8,6),new THREE.MeshLambertMaterial({color:0x2a6a30})); f.position.set(x,2.8,z); f.castShadow=true; scene.add(f); }
+
+// Outdoor daylight
+scene.add(new THREE.AmbientLight(0xfff8e0,.8));
+const sun=new THREE.DirectionalLight(0xfff8e0,1.4); sun.position.set(8,15,5); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); scene.add(sun);
+pl(0xff8830,1.2,0,1.5,-2,8);  // grill fire glow
+pl(0xffd080,.5,-4,3,4,6);   // string lights
+
+// Ground (grass)
+tip(box(16,.12,16,0x2d5a27,0,0,0),'Lawn',[
+  'Overseed bare spots in fall for spring recovery — $30 fix',
+  'Raise mower blade to 3–4": taller grass chokes weeds naturally',
+  'Core aerate once a year to break up compaction',
+  'Artificial turf eliminates maintenance but costs $10–20/sq ft installed'
+]);
+
+// House back wall
+box(10,5,.3,0x8a7a6a,0,2.5,-8);
+box(10,.4,3,0x7a6a5a,0,-.06,-6.5); // foundation
+
+// Deck
+const deck = box(7,.18,4.5,0x6b4c2a,0,.09,-5);
+tip(deck,'Deck',[
+  'Composite decking costs 3x more upfront but never needs staining',
+  'Clean and reseal pressure-treated wood every 2 years',
+  'Built-in benches along the perimeter double as railing + seating',
+  'Add fascia boards to hide the deck structure for a cleaner look'
+]);
+// Deck railing
+[[-3.5,.75,-.75],[3.5,.75,-.75],[-3.5,.75,-2.75],[3.5,.75,-2.75]].forEach(p=>box(.08,.8,.08,0x4a3018,p[0],p[1],p[2]));
+box(7,.08,.08,0x4a3018,0,.85,-.75); box(7,.08,.08,0x4a3018,0,.85,-2.75);
+
+// Patio (stone)
+const patio = box(6,.12,4,0x6a6050,-2.5,.06,2);
+tip(patio,'Patio',[
+  'Concrete pavers cost $8–15/sq ft installed — upgrade from raw concrete',
+  'Pattern matters: herringbone and running bond both look high-end',
+  'Leave 1/4" joints between pavers for drainage and stability',
+  'Add a fire pit in the center to anchor the seating zone'
+]);
+
+// Outdoor furniture
+const osofa = box(2.6,.45,1.1,0x556670,-2.5,.3,1.5);
+tip(osofa,'Outdoor Furniture',[
+  'All-weather wicker is the best value for outdoor seating',
+  'Cover cushions in Sunbrella fabric — it actually lasts outside',
+  'Add a side table and umbrella to complete the zone',
+  'Outdoor rugs anchor the seating area and resist mold'
+]);
+box(2.4,.45,.2,0x445560,-2.5,.7,1.0);  // sofa back
+box(1.5,.08,.9,0x6a6050,-2.5,.55,2.8); // coffee table
+
+// Grill / Outdoor kitchen
+const grill = box(1.2,.95,.6,0x333333,3,.47,1);
+tip(grill,'Outdoor Kitchen / Grill',[
+  'A built-in grill adds more home value than a portable one',
+  'Run a natural gas line for the grill — no tank swapping ever',
+  'Add a concrete counter beside the grill for prep space',
+  'A pergola over the outdoor kitchen extends its use in rain'
+]);
+box(1.2,.05,.6,0x555555,3,.98,1); // grill grate
+pl(0xff6620,1.2,3,.8,1,4);
+
+// Fire pit
+const fp = new THREE.Mesh(new THREE.CylinderGeometry(.7,.75,.3,12),new THREE.MeshLambertMaterial({color:0x4a4040}));
+fp.position.set(2,.15,3.5); fp.castShadow=true; scene.add(fp);
+tip(fp,'Fire Pit',[
+  'A permanent in-ground fire pit adds a focal point to any backyard',
+  'Gas fire pit is cleaner and controllable; wood is more primal',
+  'Surround with a sand or gravel buffer for code compliance and safety',
+  'Add seating walls around the fire pit to define the social zone'
+]);
+pl(0xff5010,1.5,2,0.6,3.5,4);
+
+// Fence (back + sides)
+tip(box(16,.08,1.4,0x5a4a30,0,1,-7.8),'Fence',[
+  'Cedar and redwood are the premium natural fence materials',
+  'Composite fencing needs zero maintenance and won\'t warp',
+  'Add lattice on top of a solid fence for extra privacy + airflow',
+  'Horizontal boards look more modern than traditional vertical picket'
+]);
+[-7,7].forEach(x=>box(.08,1.4,15,0x5a4a30,x,1,0));
+
+// Garden beds
+tip(box(3,.3,1.2,0x3a2818,-4.5,.15,3),'Garden Beds',[
+  'Raised beds: fewer weeds, better drainage, easier on your back',
+  'Cedar is the best wood for raised beds — naturally rot-resistant',
+  'Use a 60/40 mix of topsoil and compost to fill raised beds',
+  'Edging around beds defines the lawn/bed border cleanly'
+]);
+box(3,.2,1.2,0x2a5a20,-4.5,.45,3); // soil + plants
+
+// Trees / landscaping
+tree(-6,0); tree(6,-1); tree(-5,-6);
+
+// String lights suggestion
+tip(box(8,.04,.04,0xffdd80,0,3.5,-2),'String Lights & Lighting',[
+  'Cafe string lights turn any backyard into an outdoor room at night',
+  'Low-voltage path lighting adds safety and charm for <$100',
+  'Solar spotlights on key plants — no wiring, still looks designed',
+  'Add step lights on deck stairs for safety and evening appeal'
+]);
+
+function animate(){ requestAnimationFrame(animate); const dt=Math.min(clock.getDelta(),.05); move(dt); camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch; if(locked)checkH(); renderer.render(scene,camera); }
+animate();
+window.addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>
