@@ -16,6 +16,8 @@
     #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem} #overlay p{color:#888;font-size:.9rem;max-width:360px;margin-bottom:1.5rem;line-height:1.6}
     #overlay .ob{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
     .ok{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace;margin:.25rem}
+    .ov-nav-btn{display:block;padding:.65rem 1.2rem;border-radius:8px;border:1px solid #333;background:rgba(255,255,255,.05);color:#ccc;font-size:.85rem;font-weight:600;text-decoration:none;text-align:center;transition:all .2s}
+    .ov-nav-btn:hover{border-color:#3b82f6;color:#3b82f6}
     #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
     #hud-r{display:flex;gap:.6rem;pointer-events:all} .hb{padding:.3rem .85rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#888;font-size:.7rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px)} .hb:hover{border-color:#3b82f6;color:#3b82f6}
     #ch{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s} #ch.hot{color:#3b82f6}
@@ -31,6 +33,11 @@
   <p>Walk around and look at the bed, walls, closet, and lighting for renovation tips.</p>
   <div style="margin-bottom:1rem"><span class="ok">W A S D</span><span class="ok">Mouse</span><span class="ok">ESC</span></div>
   <button class="ob" id="sb">Enter Bedroom &#8594;</button>
+  <div id="ov-nav" style="display:flex;flex-direction:column;gap:.6rem;width:100%;max-width:240px;margin-top:.75rem">
+    <a href="index.html" class="ov-nav-btn">&#8592; All Rooms</a>
+    <a href="../ai-room-builder.html" class="ov-nav-btn" style="border-color:#444">&#129302; AI Builder</a>
+    <a href="../index.html" class="ov-nav-btn" style="border-color:#444">&#127968; Redomy Home</a>
+  </div>
 </div>
 <div id="hud">
   <div><div style="font-size:.78rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.05em">&#128716; Bedroom</div><div style="font-size:.68rem;color:#555">Look at objects for tips</div></div>
@@ -48,7 +55,11 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPix
 let yaw=0,pitch=0,locked=false; const keys={};
 canvas.addEventListener('click',()=>{ if(!locked) canvas.requestPointerLock(); });
 document.getElementById('sb').addEventListener('click',()=>canvas.requestPointerLock());
-document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; document.getElementById('overlay').style.display=locked?'none':'flex'; });
+let wasLocked=false;
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas;
+  if(!locked&&wasLocked){ document.getElementById('sb').innerHTML='&#9654; Resume'; document.getElementById('ov-nav').style.display='flex'; }
+  if(locked) wasLocked=true;
+  document.getElementById('overlay').style.display=locked?'none':'flex'; });
 document.addEventListener('mousemove',e=>{ if(!locked)return; yaw-=e.movementX*.0022; pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0022)); });
 document.addEventListener('keydown',e=>keys[e.code]=true); document.addEventListener('keyup',e=>keys[e.code]=false);
 const mv=new THREE.Vector3(),fw=new THREE.Vector3(),rt=new THREE.Vector3();
