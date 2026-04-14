@@ -80,14 +80,17 @@
     .upload-zone{border:2px dashed var(--border);border-radius:14px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .3s;background:rgba(59,130,246,.02);position:relative;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem}
     .upload-zone:hover,.upload-zone.drag-over{border-color:var(--blue);background:rgba(59,130,246,.06)}
     .upload-zone.has-image{border-style:solid;border-color:var(--blue);padding:0;min-height:280px}
-    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    #photo-input{display:none}
+    .upload-tap-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.4rem;border-radius:8px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:var(--blue);font-size:.85rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:.25rem}
+    .upload-tap-btn:hover{background:rgba(59,130,246,.25)}
     .upload-icon{font-size:2.5rem;opacity:.5}
     .upload-title{font-size:1rem;font-weight:700}
     .upload-sub{font-size:.82rem;color:var(--muted)}
     .upload-preview{width:100%;height:280px;object-fit:cover;border-radius:12px;display:none}
     .upload-zone.has-image .upload-preview{display:block}
     .upload-zone.has-image .upload-placeholder{display:none}
-    .upload-zone.has-image input[type=file]{z-index:2}
+    .change-photo-btn{position:absolute;bottom:.75rem;right:.75rem;padding:.4rem .9rem;border-radius:7px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.75rem;font-weight:600;cursor:pointer;display:none;font-family:inherit}
+    .upload-zone.has-image .change-photo-btn{display:block}
 
     /* ROOM TYPE SELECTOR */
     .room-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:1rem}
@@ -262,8 +265,10 @@
                 <div class="upload-icon">&#128247;</div>
                 <div class="upload-title">Drop a photo here</div>
                 <div class="upload-sub">JPEG, PNG, WebP &mdash; max 20MB<br>Photo never leaves your device</div>
+                <button type="button" class="upload-tap-btn" id="upload-tap-btn">&#128247; Choose Photo</button>
               </div>
               <img class="upload-preview" id="upload-preview" alt="Your room">
+              <button type="button" class="change-photo-btn" id="change-photo-btn">&#128247; Change Photo</button>
             </div>
           </div>
         </div>
@@ -477,8 +482,11 @@
     <p style="margin-top:.5rem">&copy; 2026 AIUNITES LLC</p>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" id="three-script"></script>
   <script>
+  var THREE_LOADED = false;
+  document.getElementById('three-script').addEventListener('load', function(){ THREE_LOADED = true; });
+  document.getElementById('three-script').addEventListener('error', function(){ THREE_LOADED = false; });
   // ── DATA ──────────────────────────────────────────────────────────────────
   var ROOMS = {
     living:    { label:'Living Room',    walk:'rooms/living-room.html',
@@ -552,40 +560,41 @@
   var uploadPreview = document.getElementById('upload-preview');
   var analyzeBtn = document.getElementById('analyze-btn');
 
+  function triggerUpload(){ photoInput.click(); }
+  document.getElementById('upload-tap-btn').addEventListener('click', function(e){ e.stopPropagation(); triggerUpload(); });
+  document.getElementById('change-photo-btn').addEventListener('click', function(e){ e.stopPropagation(); triggerUpload(); });
+  // Also allow tapping the zone itself (desktop convenience)
+  uploadZone.addEventListener('click', function(e){
+    if(e.target === uploadZone || e.target.classList.contains('upload-placeholder')){ triggerUpload(); }
+  });
+
+  function handleFile(file){
+    if(!file || !file.type.startsWith('image/')) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      uploadPreview.src = e.target.result;
+      uploadZone.classList.add('has-image');
+      state.hasImage = true;
+      analyzeBtn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+  }
+
   photoInput.addEventListener('change', function(){
-    if(photoInput.files && photoInput.files[0]){
-      var reader = new FileReader();
-      reader.onload = function(e){
-        uploadPreview.src = e.target.result;
-        uploadZone.classList.add('has-image');
-        state.hasImage = true;
-        analyzeBtn.disabled = false;
-      };
-      reader.readAsDataURL(photoInput.files[0]);
-    }
+    if(photoInput.files && photoInput.files[0]) handleFile(photoInput.files[0]);
   });
   uploadZone.addEventListener('dragover', function(e){ e.preventDefault(); uploadZone.classList.add('drag-over'); });
   uploadZone.addEventListener('dragleave', function(){ uploadZone.classList.remove('drag-over'); });
   uploadZone.addEventListener('drop', function(e){
     e.preventDefault(); uploadZone.classList.remove('drag-over');
-    var file = e.dataTransfer.files[0];
-    if(file && file.type.startsWith('image/')){
-      photoInput.files = e.dataTransfer.files;
-      var reader = new FileReader();
-      reader.onload = function(ev){
-        uploadPreview.src = ev.target.result;
-        uploadZone.classList.add('has-image');
-        state.hasImage = true;
-        analyzeBtn.disabled = false;
-      };
-      reader.readAsDataURL(file);
-    }
+    handleFile(e.dataTransfer.files[0]);
   });
 
   analyzeBtn.addEventListener('click', startAnalysis);
 
   // ── ANALYSIS FLOW ─────────────────────────────────────────────────────────
   function startAnalysis(){
+    try {
     analyzeBtn.disabled = true;
     document.getElementById('result-idle').style.display = 'none';
     document.getElementById('result-done').style.display = 'none';
@@ -616,6 +625,12 @@
       }, durations[cur]);
     }
     runStep();
+    } catch(err) {
+      document.getElementById('result-analyzing').style.display = 'none';
+      document.getElementById('result-idle').style.display = 'block';
+      document.getElementById('result-idle').innerHTML = '<div class="ri-big">&#9888;</div><p>Something went wrong. Please try again.</p>';
+      analyzeBtn.disabled = false;
+    }
   }
 
   function showResult(){
@@ -642,7 +657,19 @@
     document.getElementById('palette-row').innerHTML = palHtml;
 
     // Build 3D
-    setTimeout(buildResultRoom, 100);
+    setTimeout(function(){
+      try {
+        if(typeof THREE === 'undefined') throw new Error('3D library not loaded');
+        buildResultRoom();
+      } catch(err) {
+        document.getElementById('result-canvas').style.display = 'none';
+        document.querySelector('.model-canvas-wrap').innerHTML =
+          '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:.75rem;color:#555;font-size:.85rem;text-align:center;padding:1rem">'
+          +'<div style="font-size:2.5rem">&#127968;</div>'
+          +'<p>3D preview not available on this device.<br>See renovation tips below.</p>'
+          +'</div>';
+      }
+    }, 100);
     analyzeBtn.disabled = false;
   }
 
