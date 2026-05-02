@@ -27,7 +27,6 @@
     .ov-nav-btn.compare:hover{background:rgba(16,185,129,.1)}
     #overlay .ov-keys{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
     .ov-key{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace}
-    #ad-overlay{margin:1.5rem 0;width:100%;max-width:480px;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem}
     #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:none;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
     #hud-left{display:flex;flex-direction:column;gap:4px}
     #hud-room{font-size:.8rem;font-weight:700;color:#ef4444;letter-spacing:.05em;text-transform:uppercase}
@@ -61,19 +60,6 @@
     <span class="ov-key">ESC &mdash; Release</span>
   </div>
   <button class="ov-btn" id="start-btn">Enter Room &#8594;</button>
-
-  <!-- AdSense ad slot (start overlay). Create an ad unit in AdSense dashboard,
-       paste the data-ad-slot value below, then remove the placeholder div. -->
-  <div id="ad-overlay">[AdSense unit slot &mdash; paste data-ad-slot here]</div>
-  <!--
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-4573596965267859"
-       data-ad-slot=""
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  -->
 
   <div id="ov-nav" style="display:flex;flex-direction:column;gap:.6rem;width:100%;max-width:280px;margin-top:.75rem">
     <a href="home-office-after.html" class="ov-nav-btn compare">&#10003; See the After version</a>
@@ -368,22 +354,5 @@ window.addEventListener('resize', () => {
   renderer.setSize(innerWidth, innerHeight);
 });
 </script>
-
-<!-- Genuine descriptive content: page-specific, not boilerplate.
-     Visible to users who scroll past the 3D canvas; helps with SEO + AdSense
-     content quality. Replace the auto-generated game-style boilerplate that
-     exists on the older room pages. -->
-<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.92);max-height:0;overflow:hidden;transition:max-height .3s;z-index:50" id="info-panel">
-  <div style="max-width:800px;margin:0 auto;padding:1.5rem;color:rgba(255,255,255,.75);font-size:.9rem;line-height:1.7">
-    <h2 style="font-size:1.1rem;margin-bottom:0.8rem;color:rgba(255,255,255,.9)">Why this room exists</h2>
-    <p style="margin-bottom:.8rem">Most renovation visualizers show pristine rooms. That is the wrong demo for cable management because the value of the renovation only shows up against the chaos. This room is built to look like a real working developer/maker desk: tangled bundles, power strips on the surface, a drawer of unsorted spares.</p>
-    <p style="margin-bottom:.8rem">Each clickable object pairs the problem with its fix and a recommended product class. The companion <a href="home-office-after.html" style="color:#10b981">After room</a> shows the same desk after applying every fix, so you can compare what each change actually buys you.</p>
-    <p>Cable management for a workbench is a different problem from cable management for an executive desk. The goal is not invisibility; it is identification and access. Every cable labeled, every outlet switchable, spare cables hung by category. A working lab can show 50 visible cables and still feel under control.</p>
-
-    <!-- AdSense ad slot (descriptive content area). Replace the placeholder
-         with a real ad unit once created in your AdSense dashboard. -->
-    <div style="margin:1.5rem 0;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem">[AdSense unit slot &mdash; descriptive content area]</div>
-  </div>
-</div>
 </body>
 </html>
