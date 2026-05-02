@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Office (After) &mdash; Cable Management Done Right | Redomy</title>
+  <meta name="description" content="The same home office desk after applying every cable management fix: mounted power strips, color-coded bundles, switched USB hub, pegboard cable wall. Compare to the Before room.">
+  <link rel="canonical" href="https://redomy.com/rooms/home-office-after.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}
+    canvas{display:block;width:100vw;height:100vh}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem;overflow-y:auto}
+    #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}
+    #overlay h2 .tag-after{display:inline-block;background:rgba(16,185,129,.15);color:#10b981;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle;margin-left:.5rem}
+    #overlay p{color:#888;font-size:.9rem;max-width:420px;margin-bottom:1.5rem;line-height:1.6}
+    #overlay .ov-btn{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
+    #overlay .ov-btn:hover{transform:translateY(-2px)}
+    .ov-nav-btn{display:block;padding:.65rem 1.2rem;border-radius:8px;border:1px solid #333;background:rgba(255,255,255,.05);color:#ccc;font-size:.85rem;font-weight:600;text-decoration:none;text-align:center;transition:all .2s}
+    .ov-nav-btn:hover{border-color:#10b981;color:#10b981}
+    .ov-nav-btn.compare{border-color:#ef4444;color:#ef4444}
+    .ov-nav-btn.compare:hover{background:rgba(239,68,68,.1)}
+    #overlay .ov-keys{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+    .ov-key{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace}
+    #ad-overlay{margin:1.5rem 0;width:100%;max-width:480px;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem}
+    #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:none;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+    #hud-left{display:flex;flex-direction:column;gap:4px}
+    #hud-room{font-size:.8rem;font-weight:700;color:#10b981;letter-spacing:.05em;text-transform:uppercase}
+    #hud-sub{font-size:.7rem;color:#666}
+    #hud-right{display:flex;gap:.75rem;pointer-events:all}
+    .hud-btn{padding:.35rem .9rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#999;font-size:.72rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px);transition:all .15s}
+    .hud-btn:hover{border-color:#10b981;color:#10b981}
+    .hud-btn.compare{border-color:#ef4444;color:#ef4444}
+    .hud-btn.compare:hover{background:rgba(239,68,68,.15)}
+    #crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s;line-height:1}
+    #crosshair.hot{color:#10b981}
+    #tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,18,12,.94);backdrop-filter:blur(14px);border:1px solid rgba(16,185,129,.4);border-radius:13px;padding:1.1rem 1.2rem;width:280px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+    #tip.show{opacity:1}
+    #tip-title{font-size:.82rem;font-weight:700;color:#10b981;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.04em}
+    #tip-what{font-size:.78rem;color:#ddd;line-height:1.55;margin-bottom:.6rem}
+    #tip-why-label{font-size:.65rem;font-weight:700;color:#3b82f6;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem}
+    #tip-why{font-size:.78rem;color:#ccc;line-height:1.55;margin-bottom:.5rem}
+    #tip-product{font-size:.7rem;color:#888;line-height:1.5;padding-top:.5rem;border-top:1px solid #2a2a2a;margin-top:.4rem;font-style:italic}
+    #look-hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;padding:.35rem .9rem;font-size:.72rem;color:#555;pointer-events:none;z-index:100;transition:opacity .4s}
+  </style>
+<meta property="og:image" content="https://aiunites.github.io/redomy-demo/images/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Redomy","description":"The same home office desk after applying every cable management fix. Compare to the Before room.","url":"https://redomy.com/rooms/home-office-after.html"}</script></head>
+<body>
+
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#10003;</div>
+  <h2>Home Office<span class="tag-after">After</span></h2>
+  <p>The same desk after applying every fix from the Before room. Power strips mounted underneath, color-coded bundles, switched USB hub, pegboard cable wall, magnetic docks for daily-use cables. Walk around to see what each fix looks like in place.</p>
+  <div class="ov-keys">
+    <span class="ov-key">W A S D</span>
+    <span class="ov-key">Mouse &mdash; Look</span>
+    <span class="ov-key">ESC &mdash; Release</span>
+  </div>
+  <button class="ov-btn" id="start-btn">Enter Room &#8594;</button>
+
+  <!-- AdSense ad slot (start overlay). Same as Before room - paste data-ad-slot. -->
+  <div id="ad-overlay">[AdSense unit slot &mdash; paste data-ad-slot here]</div>
+  <!--
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-4573596965267859"
+       data-ad-slot=""
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  -->
+
+  <div id="ov-nav" style="display:flex;flex-direction:column;gap:.6rem;width:100%;max-width:280px;margin-top:.75rem">
+    <a href="home-office-before.html" class="ov-nav-btn compare">&#8635; Back to the Before</a>
+    <a href="index.html" class="ov-nav-btn">&#8592; All Rooms</a>
+    <a href="../ai-room-builder.html" class="ov-nav-btn" style="border-color:#444">&#129302; AI Builder</a>
+    <a href="../index.html" class="ov-nav-btn" style="border-color:#444">&#127968; Redomy Home</a>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="hud-left">
+    <div id="hud-room">&#10003; Home Office &mdash; After</div>
+    <div id="hud-sub">Look at fixed elements to see what changed &nbsp;&middot;&nbsp; ESC = Menu</div>
+  </div>
+  <div id="hud-right">
+    <button class="hud-btn compare" onclick="window.location.href='home-office-before.html'">&#8635; Before</button>
+    <button class="hud-btn" onclick="window.location.href='index.html'">&#8592; All Rooms</button>
+  </div>
+</div>
+
+<div id="crosshair">+</div>
+<div id="tip">
+  <div id="tip-title"></div>
+  <div id="tip-what"></div>
+  <div id="tip-why-label">Why it works</div>
+  <div id="tip-why"></div>
+  <div id="tip-product"></div>
+</div>
+<div id="look-hint">Look at fixed elements to see what changed and why</div>
+<canvas id="c"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Engine ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x10141a);
+scene.fog = new THREE.Fog(0x10141a, 10, 22);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth/innerHeight, 0.05, 40);
+camera.position.set(0, 1.7, 3.5);
+
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+
+let yaw = 0, pitch = 0, locked = false;
+canvas.addEventListener('click', () => { if (!locked) canvas.requestPointerLock(); });
+document.getElementById('start-btn').addEventListener('click', () => canvas.requestPointerLock());
+let wasLocked = false;
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === canvas;
+  if (!locked && wasLocked) {
+    document.getElementById('start-btn').innerHTML = '&#9654; Resume';
+    document.getElementById('ov-nav').style.display = 'flex';
+  }
+  if (locked) wasLocked = true;
+  document.getElementById('hud').style.display = locked ? 'flex' : 'none';
+  document.getElementById('overlay').style.display = locked ? 'none' : 'flex';
+});
+document.addEventListener('mousemove', e => {
+  if (!locked) return;
+  yaw -= e.movementX * 0.0022;
+  pitch = Math.max(-1.1, Math.min(1.1, pitch - e.movementY * 0.0022));
+});
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Escape') { document.exitPointerLock(); }
+});
+document.addEventListener('keyup', e => keys[e.code] = false);
+
+// Movement
+const keys = {};
+const mv = new THREE.Vector3(), fw = new THREE.Vector3(), rt = new THREE.Vector3();
+const BOUNDS = {x:[-4.4,4.4], z:[-2.5,4.4]};
+const clock = new THREE.Clock();
+
+function move(dt) {
+  let any = false;
+  fw.set(Math.sin(yaw), 0, Math.cos(yaw));
+  rt.set(Math.cos(yaw), 0, -Math.sin(yaw));
+  mv.set(0,0,0);
+  if (keys['KeyW']||keys['ArrowUp'])    { mv.addScaledVector(fw,-1); any=true; }
+  if (keys['KeyS']||keys['ArrowDown'])  { mv.addScaledVector(fw, 1); any=true; }
+  if (keys['KeyA']||keys['ArrowLeft'])  { mv.addScaledVector(rt, 1); any=true; }
+  if (keys['KeyD']||keys['ArrowRight']) { mv.addScaledVector(rt,-1); any=true; }
+  if (!any) return;
+  mv.normalize().multiplyScalar(4 * dt);
+  camera.position.x = Math.max(BOUNDS.x[0], Math.min(BOUNDS.x[1], camera.position.x + mv.x));
+  camera.position.z = Math.max(BOUNDS.z[0], Math.min(BOUNDS.z[1], camera.position.z + mv.z));
+}
+
+// Hotspots
+const hotspots = [];
+const ray = new THREE.Raycaster();
+const ld = new THREE.Vector3();
+let active = null;
+let hintTimer = setTimeout(() => document.getElementById('look-hint').style.opacity='0', 4000);
+
+function checkHotspots() {
+  camera.getWorldDirection(ld);
+  ray.set(camera.position, ld);
+  const meshes = hotspots.map(h => h.mesh);
+  const hits = ray.intersectObjects(meshes, true);
+  const hit = hits.length ? hotspots.find(h => h.mesh === hits[0].object || h.mesh.children?.includes(hits[0].object)) : null;
+  if (hit !== active) {
+    active = hit;
+    if (hit) {
+      document.getElementById('tip-title').textContent = hit.title;
+      document.getElementById('tip-what').textContent = hit.what;
+      document.getElementById('tip-why').textContent = hit.why;
+      const prod = document.getElementById('tip-product');
+      if (hit.product) { prod.textContent = '\u2192 ' + hit.product; prod.style.display='block'; }
+      else { prod.style.display='none'; }
+      document.getElementById('tip').classList.add('show');
+      document.getElementById('crosshair').classList.add('hot');
+    } else {
+      document.getElementById('tip').classList.remove('show');
+      document.getElementById('crosshair').classList.remove('hot');
+    }
+  }
+}
+
+function box(w,h,d,col,x,y,z,ry) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:col}));
+  m.position.set(x||0,y||0,z||0);
+  if (ry) m.rotation.y = ry;
+  m.castShadow = m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function tip(mesh, title, what, why, product) {
+  hotspots.push({mesh, title, what, why, product});
+  return mesh;
+}
+function pl(col, int, x,y,z,dist=7) {
+  const l = new THREE.PointLight(col, int, dist);
+  l.position.set(x,y,z); scene.add(l); return l;
+}
+
+// ── Lights (brighter, cleaner than Before) ──────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sun = new THREE.DirectionalLight(0xfffff0, 1.1);
+sun.position.set(4,10,5); sun.castShadow=true; scene.add(sun);
+pl(0xffe8a0, 1.2, 0, 3.2, 0, 9);
+pl(0x6080ff, 1.4, 0, 1.6, -3.5, 5);   // monitor glow
+pl(0x40ff80, 0.5, -2, 1.2, -3.5, 4);  // status LED glow
+
+// ── Room ────────────────────────────────────────────────────────────────
+box(10, .06, 10, 0x2a2520, 0, 0, 0);
+box(10, .08, 10, 0x252530, 0, 3.5, 0);
+box(10, 3.5, .1, 0x2a2a36, 0, 1.75, -5);
+box(10, 3.5, .1, 0x252530, 0, 1.75, 5);
+box(.1, 3.5, 10, 0x2a2a36, -5, 1.75, 0);
+box(.1, 3.5, 10, 0x252530, 5, 1.75, 0);
+
+// ── Pegboard wall (behind desk, key feature) ────────────────────────────
+const pegboard = box(4.0, 1.6, .04, 0x6b4226, 0, 2.5, -4.95);
+// Pegboard hole pattern (small dark dots)
+for (let px = -1.7; px <= 1.7; px += 0.3) {
+  for (let py = 1.85; py <= 3.05; py += 0.3) {
+    box(.04, .04, .02, 0x2a1810, px, py, -4.92);
+  }
+}
+// Hung cables on pegboard, hung in neat coils, color-coded by category
+function coil(col, x, y) {
+  box(.18, .18, .04, col, x, y, -4.88);            // coiled cable body
+  box(.04, .04, .04, 0xc0c0c0, x, y - 0.13, -4.88); // hanging end
+}
+coil(0x10b981, -1.6, 2.7);  // green = USB-A
+coil(0x10b981, -1.3, 2.7);
+coil(0x3b82f6, -0.9, 2.7);  // blue = USB-C
+coil(0x3b82f6, -0.6, 2.7);
+coil(0xef4444,  0.0, 2.7);  // red = HDMI
+coil(0xef4444,  0.3, 2.7);
+coil(0xf59e0b,  0.9, 2.7);  // yellow = ethernet
+coil(0xf59e0b,  1.2, 2.7);
+coil(0xa855f7,  1.6, 2.7);  // purple = audio
+// Small label tags below each section
+box(.5, .08, .01, 0x101010, -1.45, 2.45, -4.88);
+box(.5, .08, .01, 0x101010, -0.75, 2.45, -4.88);
+box(.5, .08, .01, 0x101010,  0.15, 2.45, -4.88);
+box(.5, .08, .01, 0x101010,  1.05, 2.45, -4.88);
+box(.5, .08, .01, 0x101010,  1.6,  2.45, -4.88);
+tip(pegboard, 'Pegboard Cable Wall',
+  'Spare cables hung by category on a pegboard mounted to the wall behind the desk. USB-A green, USB-C blue, HDMI red, ethernet yellow, audio purple. Each category has a label below.',
+  'Spare cables that live in a drawer become a tangled mass nobody can find anything in. Hung in coils on a wall with category labels, the right cable is always 2 seconds away. Color coding lets the eye find it without reading the label.',
+  'IKEA SKADIS pegboard or generic 2x4 pegboard kit. Small S-hooks for hanging coiled cables.');
+
+// ── Desk ────────────────────────────────────────────────────────────────
+const desk = box(4.5, .08, 1.4, 0x3a2a1c, 0, 0.78, -3.9);
+box(.08, .78, 1.4, 0x2e2014, -2.21, 0.39, -3.9);
+box(.08, .78, 1.4, 0x2e2014,  2.21, 0.39, -3.9);
+box(4.5, .12, .08, 0x2e2014, 0, 0.74, -3.25);
+
+// ── Power strips MOUNTED UNDERNEATH (visible from in front, indicated) ──
+const stripUnder1 = box(1.2, .06, .14, 0xffffff, -1.2, 0.65, -3.5);
+const stripUnder2 = box(1.2, .06, .14, 0x2a2a2a,  1.2, 0.65, -3.5);
+// Small green LED dots on each switch position (per-port switched strip)
+for (let i = 0; i < 6; i++) {
+  box(.03, .02, .02, 0x10b981, -1.5 + i*0.12, 0.69, -3.45);
+  box(.03, .02, .02, 0x10b981,  1.0 + i*0.08, 0.69, -3.45);
+}
+tip(stripUnder1, 'Power Strips, Mounted',
+  'Strips velcroed to the underside of the desk. The desktop is clear; outlets stay accessible. Per-outlet switches with green LEDs let you power-cycle one device without unplugging anything.',
+  'A switched outlet strip turns "is the device frozen or is the power flaky" into a one-second test. For a workbench you reset things on, this saves hours over the year.',
+  'APC P11VT3, Tripp Lite TLP1208TEL, or any switched-outlet strip from a known brand.');
+
+// ── Monitors on monitor arms ────────────────────────────────────────────
+const monL = box(1.4, .85, .04, 0x101218, -1.0, 1.55, -4.4);
+box(1.36, .81, .01, 0x1a3060, -1.0, 1.55, -4.38);
+const monR = box(1.4, .85, .04, 0x101218, 1.0, 1.55, -4.4);
+box(1.36, .81, .01, 0x1a3060, 1.0, 1.55, -4.38);
+// Monitor arms (vertical pole + horizontal arm)
+box(.06, 1.4, .06, 0x2a2a2a, -1.0, 1.5, -4.85);
+box(.06, 1.4, .06, 0x2a2a2a,  1.0, 1.5, -4.85);
+box(.5, .04, .04, 0x2a2a2a, -1.0, 1.55, -4.65);
+box(.5, .04, .04, 0x2a2a2a,  1.0, 1.55, -4.65);
+tip(box(.6, 1.4, .15, 0x000000, -1.0, 1.5, -4.85), 'Monitor Arms with Cable Channel',
+  'Both monitors on adjustable arms. Cables run inside the arm tubing instead of dangling behind. The desktop area behind the screens is clear.',
+  'Monitor arms do two things: free the entire footprint of the monitor base, and give you a built-in channel to route the monitor cables down through. Bigger upgrade than it sounds; transformative once installed.',
+  'AmazonBasics dual monitor arm or Ergotron LX for higher quality.');
+
+// ── Cable comb on desktop (parallel cables, identifiable) ───────────────
+const comb = box(.6, .08, .14, 0x101010, 0, 0.84, -4.0);
+// Parallel cable strands through comb slots, color-coded
+function strand(col, x) {
+  box(.04, .04, .35, col, x, 0.86, -3.85);  // visible portion forward of comb
+  box(.04, .04, .25, col, x, 0.86, -4.15);  // toward back wall
+}
+strand(0x10b981, -0.18);  // green
+strand(0x3b82f6, -0.08);
+strand(0xffffff,  0.02);
+strand(0xef4444,  0.12);
+strand(0xf59e0b,  0.22);
+tip(comb, 'Cable Comb',
+  'Active cables routed through a desktop comb. Each cable in its own slot, parallel and color-coded. Visible at all times, never tangled, individually grabbable.',
+  'The keep-it-tidy version of bundling. Instead of merging cables into one opaque mass with velcro, the comb keeps them parallel and separate. Workshop philosophy: legible, not invisible.',
+  'Anker / Baseus desktop cable holders. Look for slot-style organizers, not adhesive clips.');
+
+// ── Sabrent-style USB hub (visible, labeled, switches) ──────────────────
+const hub = box(.6, .08, .25, 0x404040, -1.7, 0.83, -3.3);
+// Per-port switches as small protrusions, with green LEDs
+for (let i = 0; i < 7; i++) {
+  box(.05, .03, .04, 0xc0c0c0, -1.95 + i*0.07, 0.86, -3.3);
+  box(.02, .015, .02, 0x10b981, -1.95 + i*0.07, 0.875, -3.27);
+}
+// Label strip
+box(.55, .015, .04, 0xf0f0f0, -1.7, 0.86, -3.18);
+tip(hub, 'Switched USB Hub',
+  'A 7-port USB hub where each port has its own physical switch and status LED. Labels above each port say what plugs in: monitor 1, mic, capture card, test rig, etc.',
+  'Yanking a USB device used to mean physically unplugging it under the desk. Now it is a switch flick. The combination of identification (labels) and accessibility (switches) is the workbench upgrade that saves the most time.',
+  'Sabrent HB-BU10 (10-port) or HB-UMLS (4-port). Both have per-port switches and LEDs.');
+
+// ── Color-coded velcro bundles (cable runs) ─────────────────────────────
+function bundle(col, x1, x2, y, z) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(x2-x1)+0.08, .06, .08),
+                           new THREE.MeshLambertMaterial({color:col}));
+  m.position.set((x1+x2)/2, y, z);
+  scene.add(m); return m;
+}
+const bundleL = bundle(0x10b981, -2.5, -1.5, 0.68, -3.3);  // green run
+const bundleR = bundle(0x3b82f6,  1.5,  2.5, 0.68, -3.3);  // blue run
+tip(bundleL, 'Color-Coded Cable Bundles',
+  'Cable runs bundled by destination, not by length. Green bundle goes to the left peripheral cluster, blue goes right. Velcro straps (not zip ties) so any bundle can be opened and re-bundled when gear changes.',
+  'Bundling tells you what a cable run does at a glance. Color tells you which one. Five seconds of lookup instead of five minutes of tracing.',
+  'Reusable velcro cable ties: ~$8 per 100. Multiple colors so each run is distinct.');
+
+// ── Magnetic cable dock on desk edge ────────────────────────────────────
+const dock = box(.5, .03, .08, 0x404040, 0, 0.815, -3.21);
+// Magnetic pickup points (small metallic dots)
+for (let i = 0; i < 4; i++) {
+  box(.025, .015, .03, 0xc0c0c0, -0.18 + i*0.12, 0.83, -3.21);
+}
+// One cable currently snapped in
+box(.04, .04, .15, 0x101010, 0.06, 0.83, -3.25);
+box(.06, .04, .04, 0xc0c0c0, 0.06, 0.83, -3.32);
+tip(dock, 'Magnetic Cable Dock',
+  'Magnetic strip on the front edge of the desk. Daily-use cables (charger, headphones, test device) snap into place when not in use. Always reachable from the desk surface, never dangling.',
+  'Different from hiding cables: this exposes them in a controlled way. The cables you actually use every day get a fixed dock spot so you can grab them without rummaging.',
+  'Magnetic cable holders: ~$10 for a 5-pack on Amazon.');
+
+// ── Keyboard + trackball (clean) ────────────────────────────────────────
+box(1.6, .04, .5, 0x1a1a1a, -0.4, 0.81, -3.2);
+box(1.55, .02, .45, 0x40ff80, -0.4, 0.835, -3.2); // green underglow (status, not RGB chaos)
+box(.3, .12, .4, 0xc8c8c8, 1.0, 0.85, -3.2);
+box(.18, .18, .18, 0xc02020, 1.0, 0.95, -3.2);
+
+// ── Visible cable labels on the bundles (small white tags) ──────────────
+box(.1, .04, .02, 0xf0f0f0, -2.0, 0.72, -3.3);
+box(.1, .04, .02, 0xf0f0f0, -1.7, 0.72, -3.3);
+box(.1, .04, .02, 0xf0f0f0,  1.7, 0.72, -3.3);
+box(.1, .04, .02, 0xf0f0f0,  2.0, 0.72, -3.3);
+const label = box(.4, .12, .04, 0xf0f0f0, -2.0, 0.72, -3.3);
+tip(label, 'Labels on Both Ends',
+  'Every cable end labeled. White tags with destination text on each end of every cable. Trace turns into read.',
+  'The single highest-impact thing you can do for a working bench. Cheap label maker, masking tape and Sharpie, anything works. The act of labeling is what matters: a labeled cable becomes a known cable.',
+  'Brother P-touch PT-D210 (~$30) or PT-H110 for handheld. Or masking tape + permanent marker.');
+
+// ── Office chair ────────────────────────────────────────────────────────
+box(.6, .1, .55, 0x1a1a1a, 0, 0.55, -2.3);
+box(.55, .8, .1, 0x1a1a1a, 0, 1.0, -2.05);
+box(.05, .55, .05, 0x808080, 0, 0.27, -2.3);
+box(.85, .04, .85, 0x606060, 0, 0.06, -2.3);
+
+// ── Window ──────────────────────────────────────────────────────────────
+box(.06, 1.6, 2.4, 0x6a96d4, -4.95, 2.0, 0);
+
+// ── Animate ─────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  move(dt);
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+  if (locked) checkHotspots();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+
+<!-- Genuine descriptive content (page-specific, not boilerplate). -->
+<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.92);max-height:0;overflow:hidden;transition:max-height .3s;z-index:50" id="info-panel">
+  <div style="max-width:800px;margin:0 auto;padding:1.5rem;color:rgba(255,255,255,.75);font-size:.9rem;line-height:1.7">
+    <h2 style="font-size:1.1rem;margin-bottom:0.8rem;color:rgba(255,255,255,.9)">What changed and why</h2>
+    <p style="margin-bottom:.8rem">This is the same desk as the <a href="home-office-before.html" style="color:#ef4444">Before room</a>, after applying every fix. Same monitors, same chair, same trackball. The geometry of the room did not change; only the cable management did.</p>
+    <p style="margin-bottom:.8rem">The principle is workshop-style cable management: identification and access over invisibility. A working bench can have 50 visible cables and still feel under control as long as every cable is labeled, every outlet is switchable, and spare cables hang on a wall by category. Hiding cables in a tray works for an executive desk; on a bench you need to reach them.</p>
+    <p>Total upgrade cost: roughly $50-$120 in supplies depending on whether you add monitor arms. Single Saturday-afternoon project. The before/after on a real working desk is dramatic.</p>
+
+    <!-- AdSense ad slot (descriptive content area). -->
+    <div style="margin:1.5rem 0;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem">[AdSense unit slot &mdash; descriptive content area]</div>
+  </div>
+</div>
+</body>
+</html>

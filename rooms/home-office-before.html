@@ -1,0 +1,389 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VP15KRLV6P"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-VP15KRLV6P');</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4573596965267859" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Office (Before) &mdash; Cable Management Walk-Through | Redomy</title>
+  <meta name="description" content="Walk through a 3D home office with realistic cable chaos. See exactly what's wrong with the typical developer/maker desk and what to fix first. Compare to the After room.">
+  <link rel="canonical" href="https://redomy.com/rooms/home-office-before.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Syne',sans-serif;background:#000;overflow:hidden;color:#fff}
+    canvas{display:block;width:100vw;height:100vh}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;text-align:center;padding:2rem;overflow-y:auto}
+    #overlay h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem}
+    #overlay h2 .tag-before{display:inline-block;background:rgba(239,68,68,.15);color:#ef4444;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:6px;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle;margin-left:.5rem}
+    #overlay p{color:#888;font-size:.9rem;max-width:420px;margin-bottom:1.5rem;line-height:1.6}
+    #overlay .ov-btn{padding:.8rem 2rem;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border:none;color:#fff;font-size:1rem;font-weight:700;font-family:inherit;cursor:pointer}
+    #overlay .ov-btn:hover{transform:translateY(-2px)}
+    .ov-nav-btn{display:block;padding:.65rem 1.2rem;border-radius:8px;border:1px solid #333;background:rgba(255,255,255,.05);color:#ccc;font-size:.85rem;font-weight:600;text-decoration:none;text-align:center;transition:all .2s}
+    .ov-nav-btn:hover{border-color:#3b82f6;color:#3b82f6}
+    .ov-nav-btn.compare{border-color:#10b981;color:#10b981}
+    .ov-nav-btn.compare:hover{background:rgba(16,185,129,.1)}
+    #overlay .ov-keys{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+    .ov-key{background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:.3rem .7rem;font-size:.78rem;color:#888;font-family:monospace}
+    #ad-overlay{margin:1.5rem 0;width:100%;max-width:480px;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem}
+    #hud{position:fixed;top:0;left:0;right:0;z-index:100;padding:10px 16px;display:none;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+    #hud-left{display:flex;flex-direction:column;gap:4px}
+    #hud-room{font-size:.8rem;font-weight:700;color:#ef4444;letter-spacing:.05em;text-transform:uppercase}
+    #hud-sub{font-size:.7rem;color:#666}
+    #hud-right{display:flex;gap:.75rem;pointer-events:all}
+    .hud-btn{padding:.35rem .9rem;border-radius:7px;border:1px solid #2a2a2a;background:rgba(0,0,0,.6);color:#999;font-size:.72rem;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px);transition:all .15s}
+    .hud-btn:hover{border-color:#3b82f6;color:#3b82f6}
+    .hud-btn.compare{border-color:#10b981;color:#10b981}
+    .hud-btn.compare:hover{background:rgba(16,185,129,.15)}
+    #crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.1rem;z-index:100;pointer-events:none;color:rgba(255,255,255,.5);transition:color .2s;line-height:1}
+    #crosshair.hot{color:#ef4444}
+    #tip{position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(8,10,18,.94);backdrop-filter:blur(14px);border:1px solid rgba(239,68,68,.4);border-radius:13px;padding:1.1rem 1.2rem;width:280px;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none}
+    #tip.show{opacity:1}
+    #tip-title{font-size:.82rem;font-weight:700;color:#ef4444;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em}
+    #tip-problem{font-size:.78rem;color:#ccc;line-height:1.55;margin-bottom:.7rem;padding-bottom:.6rem;border-bottom:1px solid #2a2a2a}
+    #tip-fix-label{font-size:.65rem;font-weight:700;color:#10b981;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem}
+    #tip-fix{font-size:.78rem;color:#ddd;line-height:1.55;margin-bottom:.5rem}
+    #tip-product{font-size:.7rem;color:#888;line-height:1.5;padding-top:.5rem;border-top:1px solid #2a2a2a;margin-top:.4rem;font-style:italic}
+    #look-hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-radius:20px;padding:.35rem .9rem;font-size:.72rem;color:#555;pointer-events:none;z-index:100;transition:opacity .4s}
+  </style>
+<meta property="og:image" content="https://aiunites.github.io/redomy-demo/images/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Redomy","description":"Walk through a 3D home office with realistic cable chaos and learn what to fix first. Part of the Redomy renovation visualizer.","url":"https://redomy.com/rooms/home-office-before.html"}</script></head>
+<body>
+
+<div id="overlay">
+  <div style="font-size:3rem;margin-bottom:.5rem">&#128187;</div>
+  <h2>Home Office<span class="tag-before">Before</span></h2>
+  <p>The realistic developer/maker desk: tangled cables, power strips on the surface, mystery wires, and a drawer of spares you can't find anything in. Walk around and look at each problem area to see what to fix and how.</p>
+  <div class="ov-keys">
+    <span class="ov-key">W A S D</span>
+    <span class="ov-key">Mouse &mdash; Look</span>
+    <span class="ov-key">ESC &mdash; Release</span>
+  </div>
+  <button class="ov-btn" id="start-btn">Enter Room &#8594;</button>
+
+  <!-- AdSense ad slot (start overlay). Create an ad unit in AdSense dashboard,
+       paste the data-ad-slot value below, then remove the placeholder div. -->
+  <div id="ad-overlay">[AdSense unit slot &mdash; paste data-ad-slot here]</div>
+  <!--
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-4573596965267859"
+       data-ad-slot=""
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  -->
+
+  <div id="ov-nav" style="display:flex;flex-direction:column;gap:.6rem;width:100%;max-width:280px;margin-top:.75rem">
+    <a href="home-office-after.html" class="ov-nav-btn compare">&#10003; See the After version</a>
+    <a href="index.html" class="ov-nav-btn">&#8592; All Rooms</a>
+    <a href="../ai-room-builder.html" class="ov-nav-btn" style="border-color:#444">&#129302; AI Builder</a>
+    <a href="../index.html" class="ov-nav-btn" style="border-color:#444">&#127968; Redomy Home</a>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="hud-left">
+    <div id="hud-room">&#128187; Home Office &mdash; Before</div>
+    <div id="hud-sub">Look at objects for problems &amp; fixes &nbsp;&middot;&nbsp; ESC = Menu</div>
+  </div>
+  <div id="hud-right">
+    <button class="hud-btn compare" onclick="window.location.href='home-office-after.html'">&#10003; After</button>
+    <button class="hud-btn" onclick="window.location.href='index.html'">&#8592; All Rooms</button>
+  </div>
+</div>
+
+<div id="crosshair">+</div>
+<div id="tip">
+  <div id="tip-title"></div>
+  <div id="tip-problem"></div>
+  <div id="tip-fix-label">Fix</div>
+  <div id="tip-fix"></div>
+  <div id="tip-product"></div>
+</div>
+<div id="look-hint">Look at objects to see the problem and the fix</div>
+<canvas id="c"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Engine ──────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e1014);
+scene.fog = new THREE.Fog(0x0e1014, 10, 22);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth/innerHeight, 0.05, 40);
+camera.position.set(0, 1.7, 3.5);
+
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+
+// Pointer lock
+let yaw = 0, pitch = 0, locked = false;
+canvas.addEventListener('click', () => { if (!locked) canvas.requestPointerLock(); });
+document.getElementById('start-btn').addEventListener('click', () => canvas.requestPointerLock());
+let wasLocked = false;
+document.addEventListener('pointerlockchange', () => {
+  locked = document.pointerLockElement === canvas;
+  if (!locked && wasLocked) {
+    document.getElementById('start-btn').innerHTML = '&#9654; Resume';
+    document.getElementById('ov-nav').style.display = 'flex';
+  }
+  if (locked) wasLocked = true;
+  document.getElementById('hud').style.display = locked ? 'flex' : 'none';
+  document.getElementById('overlay').style.display = locked ? 'none' : 'flex';
+});
+document.addEventListener('mousemove', e => {
+  if (!locked) return;
+  yaw -= e.movementX * 0.0022;
+  pitch = Math.max(-1.1, Math.min(1.1, pitch - e.movementY * 0.0022));
+});
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Escape') { document.exitPointerLock(); }
+});
+document.addEventListener('keyup', e => keys[e.code] = false);
+
+// Movement
+const keys = {};
+const mv = new THREE.Vector3(), fw = new THREE.Vector3(), rt = new THREE.Vector3();
+const BOUNDS = {x:[-4.4,4.4], z:[-2.5,4.4]};
+const clock = new THREE.Clock();
+
+function move(dt) {
+  let any = false;
+  fw.set(Math.sin(yaw), 0, Math.cos(yaw));
+  rt.set(Math.cos(yaw), 0, -Math.sin(yaw));
+  mv.set(0,0,0);
+  if (keys['KeyW']||keys['ArrowUp'])    { mv.addScaledVector(fw,-1); any=true; }
+  if (keys['KeyS']||keys['ArrowDown'])  { mv.addScaledVector(fw, 1); any=true; }
+  if (keys['KeyA']||keys['ArrowLeft'])  { mv.addScaledVector(rt, 1); any=true; }
+  if (keys['KeyD']||keys['ArrowRight']) { mv.addScaledVector(rt,-1); any=true; }
+  if (!any) return;
+  mv.normalize().multiplyScalar(4 * dt);
+  camera.position.x = Math.max(BOUNDS.x[0], Math.min(BOUNDS.x[1], camera.position.x + mv.x));
+  camera.position.z = Math.max(BOUNDS.z[0], Math.min(BOUNDS.z[1], camera.position.z + mv.z));
+}
+
+// Hotspots
+const hotspots = [];
+const ray = new THREE.Raycaster();
+const ld = new THREE.Vector3();
+let active = null;
+let hintTimer = setTimeout(() => document.getElementById('look-hint').style.opacity='0', 4000);
+
+function checkHotspots() {
+  camera.getWorldDirection(ld);
+  ray.set(camera.position, ld);
+  const meshes = hotspots.map(h => h.mesh);
+  const hits = ray.intersectObjects(meshes, true);
+  const hit = hits.length ? hotspots.find(h => h.mesh === hits[0].object || h.mesh.children?.includes(hits[0].object)) : null;
+  if (hit !== active) {
+    active = hit;
+    if (hit) {
+      document.getElementById('tip-title').textContent = hit.title;
+      document.getElementById('tip-problem').textContent = hit.problem;
+      document.getElementById('tip-fix').textContent = hit.fix;
+      const prod = document.getElementById('tip-product');
+      if (hit.product) { prod.textContent = '\u2192 ' + hit.product; prod.style.display='block'; }
+      else { prod.style.display='none'; }
+      document.getElementById('tip').classList.add('show');
+      document.getElementById('crosshair').classList.add('hot');
+    } else {
+      document.getElementById('tip').classList.remove('show');
+      document.getElementById('crosshair').classList.remove('hot');
+    }
+  }
+}
+
+// Helpers
+function box(w,h,d,col,x,y,z,ry) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:col}));
+  m.position.set(x||0,y||0,z||0);
+  if (ry) m.rotation.y = ry;
+  m.castShadow = m.receiveShadow = true;
+  scene.add(m); return m;
+}
+function tip(mesh, title, problem, fix, product) {
+  hotspots.push({mesh, title, problem, fix, product});
+  return mesh;
+}
+function pl(col, int, x,y,z,dist=7) {
+  const l = new THREE.PointLight(col, int, dist);
+  l.position.set(x,y,z); scene.add(l); return l;
+}
+
+// ── Lights ──────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+const sun = new THREE.DirectionalLight(0xfffe8, 0.9);
+sun.position.set(4,10,5); sun.castShadow=true; scene.add(sun);
+pl(0xffe0a0, 1.0, 0, 3.2, 0, 9);
+pl(0x6080ff, 1.6, 0, 1.6, -3.5, 5);   // monitor glow
+pl(0x40ff80, 0.4, -2, 1.2, -3.5, 4);  // RGB keyboard glow
+
+// ── Room ────────────────────────────────────────────────────────────────
+box(10, .06, 10, 0x2a2520, 0, 0, 0);              // floor
+box(10, .08, 10, 0x252530, 0, 3.5, 0);            // ceiling
+box(10, 3.5, .1, 0x2a2a36, 0, 1.75, -5);          // back wall
+box(10, 3.5, .1, 0x252530, 0, 1.75, 5);           // front wall
+box(.1, 3.5, 10, 0x2a2a36, -5, 1.75, 0);          // left wall
+box(.1, 3.5, 10, 0x252530, 5, 1.75, 0);           // right wall
+
+// ── Desk (back wall) ────────────────────────────────────────────────────
+const desk = box(4.5, .08, 1.4, 0x3a2a1c, 0, 0.78, -3.9);
+box(.08, .78, 1.4, 0x2e2014, -2.21, 0.39, -3.9);  // left leg
+box(.08, .78, 1.4, 0x2e2014,  2.21, 0.39, -3.9);  // right leg
+box(4.5, .12, .08, 0x2e2014, 0, 0.74, -3.25);     // front rail
+tip(desk, 'The Desk Itself',
+  'Three power strips on the surface, a rats-nest under the monitors, peripherals fighting for space. Every accessory competes for visibility.',
+  'Workshop philosophy: legible, not invisible. The goal is identification + access, not hiding cables. Mount power strips underneath, label every cable, route bundles down a single channel.',
+  'Costs ~$50-80 in supplies and one Saturday afternoon.');
+
+// ── Monitors (left + right) ─────────────────────────────────────────────
+const monL = box(1.4, .85, .04, 0x101218, -1.0, 1.55, -4.4);
+box(1.36, .81, .01, 0x1a3060, -1.0, 1.55, -4.38);   // screen glow
+box(.4, .04, .25, 0x1a1a1f, -1.0, 1.10, -4.35);     // monitor stand
+const monR = box(1.4, .85, .04, 0x101218, 1.0, 1.55, -4.4);
+box(1.36, .81, .01, 0x1a3060, 1.0, 1.55, -4.38);
+box(.4, .04, .25, 0x1a1a1f, 1.0, 1.10, -4.35);
+
+// Cable spaghetti behind monitors (visible chunky tangle)
+const tangle = new THREE.Group();
+function strand(col, x, y, z, w, h, d, ry) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:col}));
+  m.position.set(x,y,z); if (ry) m.rotation.y=ry; tangle.add(m); return m;
+}
+strand(0x101010, -1.2, 0.92, -4.0, .04, .35, .04);
+strand(0x202020, -1.0, 0.88, -4.0, .04, .25, .04, 0.4);
+strand(0x101010, -0.7, 0.95, -4.0, .04, .4, .04, -0.3);
+strand(0x303030, -0.4, 0.85, -4.0, .04, .2, .04);
+strand(0xffffff,  0.3, 0.92, -4.0, .04, .35, .04, 0.6);
+strand(0x101010,  0.7, 0.88, -4.0, .04, .3, .04, -0.4);
+strand(0x303030,  1.0, 0.95, -4.0, .04, .4, .04);
+strand(0x202020,  1.3, 0.85, -4.0, .04, .25, .04, 0.5);
+// Big tangle clump at center back of desk
+strand(0x101010, 0.0, 0.86, -4.2, .8, .14, .35);
+strand(0x202020, -0.3, 0.83, -4.05, .35, .07, .25);
+strand(0x303030, 0.4, 0.85, -4.05, .25, .09, .2);
+scene.add(tangle);
+tip(tangle, 'The Cable Tangle',
+  'Mystery clump behind the monitors. When something stops working, you cannot tell which cable is which without tracing each one by hand.',
+  'Velcro-bundle by destination, not by length. Each bundle should answer "what does this run go to" at a glance. Color-code the bundles so the eye finds the right one in a second.',
+  'Reusable velcro cable ties: ~$8 for 100. Skip zip ties (cut once, redo).');
+
+// ── Power strips (multiple, on desk) ────────────────────────────────────
+const strip1 = box(1.0, .08, .18, 0xffffff, -1.6, 0.84, -3.65);
+const strip2 = box(1.0, .08, .18, 0xffffff,  0.0, 0.84, -3.55);
+const strip3 = box(1.0, .08, .18, 0x222222,  1.6, 0.84, -3.7);
+// Wall warts hanging off
+box(.18, .12, .28, 0x101010, -1.3, 0.78, -3.55);
+box(.18, .12, .28, 0x101010, -1.0, 0.78, -3.6);
+box(.18, .12, .28, 0x101010,  0.3, 0.78, -3.45);
+box(.18, .12, .28, 0x101010,  0.6, 0.78, -3.5);
+box(.18, .12, .28, 0x101010,  1.4, 0.78, -3.6);
+const stripGroup = new THREE.Group();
+[strip1, strip2, strip3].forEach(s => stripGroup.add(s));
+tip(strip1, 'Power Strips on the Desk',
+  'Three strips fighting for surface space, wall warts blocking adjacent outlets, no idea which device is on which switch.',
+  'Mount strips to the underside of the desk or shelf with velcro or screws. For troubleshooting setups, choose strips with individually-switched outlets so you can power-cycle one device without unplugging anything.',
+  'APC P11VT3 or Tripp Lite TLP1208TEL: switched outlets, surge protection.');
+
+// ── USB peripherals scattered ───────────────────────────────────────────
+const usb1 = box(.18, .04, .55, 0xc0c0c0, -1.9, 0.84, -3.0);  // small hub
+box(.04, .015, .55, 0x303030, -1.9, 0.86, -3.0);              // top label strip
+const usb2 = box(.12, .03, .35, 0x808080,  1.8, 0.83, -3.0);  // second hub
+const usb3 = box(.15, .04, .25, 0x404040,  0.9, 0.83, -2.95); // adapter
+tip(usb1, 'USB Mess',
+  'Multiple unbranded hubs daisy-chained, no port labels, no power switches. Unplugging one device means unplugging the whole hub.',
+  'One quality USB hub with individually-switched ports. Power-cycle a single device without touching anything else. Label each port for what plugs into it.',
+  'Sabrent HB-UMLS (4-port) or HB-BU10 (10-port): per-port switches and LEDs.');
+
+// ── Keyboard + trackball mouse ──────────────────────────────────────────
+box(1.6, .04, .5, 0x1a1a1a, -0.4, 0.81, -3.2);    // keyboard
+box(1.55, .02, .45, 0xff00ff, -0.4, 0.835, -3.2); // RGB underglow
+box(.3, .12, .4, 0xc8c8c8, 1.0, 0.85, -3.2);      // trackball mouse body
+box(.18, .18, .18, 0xc02020, 1.0, 0.95, -3.2);    // red trackball
+tip(box(.45, .15, .45, 0x000000, 1.0, 0.85, -3.2), 'Trackball Mouse Area',
+  'Trackball is great, but its USB cable disappears into the rats-nest. When you swap PCs you have to fish for it.',
+  'Magnetic cable dock on the front edge of the desk. Daily-use cables (mouse, keyboard, charger, headphones) snap into place when not in use; never tangle, always reachable.',
+  'Magnetic cable holders: ~$10 for a 5-pack.');
+
+// ── Mystery cable bundle (snake along wall, no labels) ──────────────────
+const wallBundle = box(.1, .08, 3.0, 0x202020, -3.0, 1.4, -4.0);
+box(.1, .08, 1.5, 0x101010, -3.05, 1.5, -3.5);
+box(.1, .08, 1.0, 0x303030, -2.95, 1.45, -3.0);
+tip(wallBundle, 'Mystery Wall Cables',
+  'Five-or-six cables running along the back wall from the desk to who-knows-where. None labeled. When one needs to come out, you trace it by hand.',
+  'Label both ends of every cable. The act of labeling matters more than the tool: a Brother P-touch ($30) is nice, but masking tape and a Sharpie work fine. Identification turns 20-minute fishing into 5-second confidence.',
+  'Brother P-touch PT-D210 or PT-H110: cheap label maker, lifelong utility.');
+
+// ── Drawer of spare cables (open + overflowing) ─────────────────────────
+const drawer = box(1.4, .35, .9, 0x1a1410, 4.0, 0.45, -3.5);
+box(1.3, .04, .85, 0x080604, 4.0, 0.62, -3.5); // drawer interior
+// Cable pile (random colored boxes, packed)
+const pile = new THREE.Group();
+function pileBox(col, x, y, z, w, h, d) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:col}));
+  m.position.set(x,y,z); pile.add(m); return m;
+}
+pileBox(0x000000, 4.0, 0.7, -3.4, .9, .08, .25);
+pileBox(0xffffff, 3.85, 0.74, -3.55, .7, .07, .2);
+pileBox(0x808080, 4.15, 0.72, -3.6, .6, .08, .2);
+pileBox(0x303030, 4.05, 0.77, -3.45, .5, .06, .15);
+pileBox(0x000000, 3.95, 0.79, -3.65, .4, .06, .15);
+scene.add(pile);
+tip(drawer, 'Drawer of Spare Cables',
+  'A bin of unlabeled cables tangled into one collective mass. To find a USB-A-to-Mini-B at midnight, you dump the whole drawer.',
+  'Pegboard or magnetic strip on the wall. Hang spare cables by category (USB-A, USB-C, HDMI, audio, ethernet). Visible at a glance, never tangled. Each hook can hold one type, looped neatly.',
+  'Wall pegboard kit: ~$30 plus hooks. Or IKEA SKADIS for a cleaner look.');
+
+// ── Office chair ────────────────────────────────────────────────────────
+const chair = box(.6, .1, .55, 0x1a1a1a, 0, 0.55, -2.3);
+box(.55, .8, .1, 0x1a1a1a, 0, 1.0, -2.05);  // back
+box(.05, .55, .05, 0x808080, 0, 0.27, -2.3); // post
+box(.85, .04, .85, 0x606060, 0, 0.06, -2.3); // base star
+
+// ── Window (side wall, dim daylight) ────────────────────────────────────
+box(.06, 1.6, 2.4, 0x6a96d4, -4.95, 2.0, 0);
+
+// ── Animate ─────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  move(dt);
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+  if (locked) checkHotspots();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+
+<!-- Genuine descriptive content: page-specific, not boilerplate.
+     Visible to users who scroll past the 3D canvas; helps with SEO + AdSense
+     content quality. Replace the auto-generated game-style boilerplate that
+     exists on the older room pages. -->
+<div style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.92);max-height:0;overflow:hidden;transition:max-height .3s;z-index:50" id="info-panel">
+  <div style="max-width:800px;margin:0 auto;padding:1.5rem;color:rgba(255,255,255,.75);font-size:.9rem;line-height:1.7">
+    <h2 style="font-size:1.1rem;margin-bottom:0.8rem;color:rgba(255,255,255,.9)">Why this room exists</h2>
+    <p style="margin-bottom:.8rem">Most renovation visualizers show pristine rooms. That is the wrong demo for cable management because the value of the renovation only shows up against the chaos. This room is built to look like a real working developer/maker desk: tangled bundles, power strips on the surface, a drawer of unsorted spares.</p>
+    <p style="margin-bottom:.8rem">Each clickable object pairs the problem with its fix and a recommended product class. The companion <a href="home-office-after.html" style="color:#10b981">After room</a> shows the same desk after applying every fix, so you can compare what each change actually buys you.</p>
+    <p>Cable management for a workbench is a different problem from cable management for an executive desk. The goal is not invisibility; it is identification and access. Every cable labeled, every outlet switchable, spare cables hung by category. A working lab can show 50 visible cables and still feel under control.</p>
+
+    <!-- AdSense ad slot (descriptive content area). Replace the placeholder
+         with a real ad unit once created in your AdSense dashboard. -->
+    <div style="margin:1.5rem 0;min-height:90px;background:rgba(255,255,255,.02);border:1px dashed #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:.7rem">[AdSense unit slot &mdash; descriptive content area]</div>
+  </div>
+</div>
+</body>
+</html>
